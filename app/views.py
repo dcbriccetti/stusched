@@ -8,13 +8,6 @@ from .models import Student as StudentModel
 from .forms import AuthenticationForm, NewUserForm, StudentForm
 
 
-class ScheduledCourse():
-    def __init__(self, name, url, sections):
-        self.name = name
-        self.url = url
-        self.sections = sections
-
-
 class Index(View):
     def get(self, request):
         return render(request, 'app/index.html')
