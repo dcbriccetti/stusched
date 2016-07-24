@@ -102,4 +102,8 @@ class NewUserForm(forms.Form):
 class StudentForm(ModelForm):
     class Meta:
         model = Student
-        fields = ('name', 'birthdate', 'email', 'wants_courses', 'when_available', 'notes')
+        fields = ('name', 'birthdate', 'school', 'email', 'wants_courses', 'when_available', 'notes')
+
+    def __init__(self, *args, **kwargs):
+        super(StudentForm, self).__init__(*args, **kwargs)
+        self.fields['birthdate'].required = True

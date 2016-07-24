@@ -8,7 +8,7 @@ from .models import Student as StudentModel
 from .forms import AuthenticationForm, NewUserForm, StudentForm
 
 
-class ScheduledCourse(object):
+class ScheduledCourse():
     def __init__(self, name, url, sections):
         self.name = name
         self.url = url
@@ -21,12 +21,7 @@ class Index(View):
 
 
 def courses(request):
-    sections = Section.objects.order_by('start_time')
-    scheduled_courses = set((s.course for s in sections))
-    scheduled_courses = [ScheduledCourse(c.name, c.url,
-        [s for s in sections if s.course == c]) for c in Course.objects.order_by('name') if c in scheduled_courses]
-
-    return render(request, 'app/courses.html', {'courses': scheduled_courses})
+    return render(request, 'app/courses.html', {'courses': Course.objects.filter(active=True).order_by('name')})
 
 
 @login_required
@@ -40,12 +35,11 @@ def students(request):
     else:
         parents = None
 
-    return render(request, 'app/students.html', {'parents': parents})
+    return render(request, 'app/students.html', {'parents': [p for p in parents if p.active()]})
 
 
-def proposals(request):
-    sections = Section.objects.order_by('start_time')
-    return render(request, 'app/proposals.html', {'sections': sections})
+def sections(request):
+    return render(request, 'app/sections.html', {'sections': Section.objects.order_by('start_time')})
 
 
 def _these_students_in_other_sections(section_id, students):
@@ -116,28 +110,60 @@ class Login(View):
 
 class Student(View):
     def get(self, request, id_str):
-        student_id = int(id_str)
-        student = StudentModel.objects.filter(id=student_id).first()
-        if self._student_ok(student, request):
-            return render(request, 'app/student.html', {'form': StudentForm(instance=student), 'student_id': student_id})
+        if id_str == '0':
+            parent = Parent.objects.filter(id=request.GET['parent_id']).first()
+            if not parent:
+                return redirect('/app/')  # todo error
+
+            form = StudentForm()
+            student_id = 0
+        else:
+            student_id = int(id_str)
+            student = StudentModel.objects.filter(id=student_id).first()
+            if not student:
+                return redirect('/app/')  # todo error
+
+            form = StudentForm(instance=student)
+            parent = student.parent
+
+        if self._student_ok(parent, request.user):
+            return render(request, 'app/student.html', {
+                'form':       form,
+                'parent_id':  parent.id,
+                'student_id': student_id,
+            })
         else:
             return redirect('/app/')
 
     def post(self, request, id_str):
-        student_id = int(id_str)
-        student = StudentModel.objects.filter(id=student_id).first()
-        if self._student_ok(student, request):
+        if id_str == '0':
+            parent = Parent.objects.filter(id=request.GET['parent_id']).first()
+            student = None
+            student_id = 0
+        else:
+            student_id = int(id_str)
+            student = StudentModel.objects.filter(id=student_id).first()
+            parent = student.parent
+        if self._student_ok(parent, request.user):
             form = StudentForm(data=request.POST, instance=student)
             if form.is_valid():
-                form.save()
+                saved_student = form.save(commit=False)
+                saved_student.parent = parent
+                saved_student.save()
+                form.save_m2m()
             else:
-                return render(request, 'app/student.html', {'form': form, 'student_id': student_id})
+                return render(request, 'app/student.html', {
+                    'form':         form,
+                    'student_id':   student_id,
+                    'parent_id':    parent.id
+                })
 
         return redirect('/app/students')
 
     @staticmethod
-    def _student_ok(student, request):
-        return student and (request.user.is_staff or request.user in student.parent.users.all())
+    def _student_ok(parent, user):
+        return user.is_staff or user in parent.users.all()
+
 
 def logOut(request):
     logout(request)

@@ -64,6 +64,7 @@ class Student(models.Model):
     active          = models.BooleanField(default=True)
     birthdate       = models.DateField(null=True, blank=True)
     grade_from_age  = models.IntegerField(null=True, blank=True)
+    school          = models.CharField(max_length=100, null=True, blank=True)
     parent          = models.ForeignKey(Parent)
     email           = models.EmailField(null=True, blank=True)
     aptitude        = models.IntegerField(null=True, blank=True)
