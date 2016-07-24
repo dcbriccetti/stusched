@@ -96,7 +96,11 @@ class Login(View):
                 user = authenticate(username=cd['username'], password=cd['password'])
                 login(request, user)
                 code = cd.get('parent_code')
-                parent = Parent.objects.get(code=code) if code else Parent(name=cd['name'], email=cd['email'])
+                if code:
+                    parent = Parent.objects.get(code=code)
+                else:
+                    parent = Parent(name=cd['name'], email=cd['email'])
+                    parent.save()
                 parent.users.add(user)
                 return redirect('/app/')
             else:
