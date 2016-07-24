@@ -16,7 +16,11 @@
     <tbody>
     {% for section in sections %}
         <tr>
-            <td><a href='/app/section/{{ section.id }}'>{{ section.id }}</a></td>
+            <td>
+                {% if user.is_staff or section.id in viewable_section_ids %}
+                <a href='/app/section/{{ section.id }}'>{{ section.id }}</a>
+                {% endif %}
+            </td>
             <td>
                 {% if section.course.url %}
                     <a href={{ section.course.url }}>{{ section.course.name }}</a>

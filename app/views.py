@@ -25,11 +25,39 @@ def students(request):
     else:
         parents = Parent.objects.filter(users=user)
 
-    return render(request, 'app/students.html', {'parents': parents})
+    return render(request, 'app/students.html', {
+        'parents': parents,
+        'viewable_section_ids': viewable_section_ids(request),
+    })
+
+
+def students_of_parent(user):
+    parents = Parent.objects.filter(users=user)
+    stus = []
+    for p in parents:
+        stus += p.student_set.all()
+    return stus
+
+
+def parent_of_one_of_these_students(user, students):
+    stus = students_of_parent(user)
+    return bool(set(stus) & set(students))
 
 
 def sections(request):
-    return render(request, 'app/sections.html', {'sections': Section.objects.order_by('start_time')})
+    return render(request, 'app/sections.html', {
+        'sections': Section.objects.order_by('start_time'),
+        'viewable_section_ids': viewable_section_ids(request)
+    })
+
+
+def viewable_section_ids(request):
+    viewable_section_ids = set()
+    if request.user and not request.user.is_staff:
+        for stu in students_of_parent(request.user):
+            for section in stu.sections.all():
+                viewable_section_ids.add(section.id)
+    return viewable_section_ids
 
 
 def _these_students_in_other_sections(section_id, students):
@@ -46,9 +74,12 @@ def _these_students_in_other_sections(section_id, students):
     return these_students_in_other_sections
 
 
+@login_required
 def section(request, section_id):
     section = Section.objects.get(id=int(section_id))
     students_in_this_section = section.student_set.all().order_by('name')
+
+    ok_to_show = request.user.is_staff or parent_of_one_of_these_students(request.user, students_in_this_section)
 
     these_students_in_other_sections = _these_students_in_other_sections(section.id, students_in_this_section)
 
@@ -62,7 +93,8 @@ def section(request, section_id):
     students_in_sections.sort(key=lambda ss: ss.section.start_time)
 
     return render(request, 'app/section.html',
-        {'section': section, 'students': students_in_this_section, 'overlaps': students_in_sections})
+        {'section': section, 'students': students_in_this_section, 'overlaps': students_in_sections,
+         'ok_to_show': ok_to_show})
 
 
 class Login(View):

@@ -5,26 +5,30 @@
 {% block content %}
     <h2>{{ section.course.name }}</h2>
     <h3>{{ section.start_time }}</h3>
+
+    {% if ok_to_show %}
     <table class="table">
     <thead>
     <tr>
         <th>Name</th>
-        <th>Birthdate</th>
         <th>Age</th>
         <th>Grade</th>
         <th>Parent</th>
+        {% if user.is_staff %}
         <th>Parent Phone</th>
+        {% endif %}
     </tr>
     </thead>
     <tbody>
     {% for s in students %}
         <tr>
         <td>{{ s.name }}</td>
-        <td>{{ s.birthdate }}</td>
         <td>{{ s.age }}</td>
         <td>{{ s.grade }}</td>
         <td>{{ s.parent.name }}</td>
+        {% if user.is_staff %}
         <td>{{ s.parent.phone }}</td>
+        {% endif %}
         </tr>
     {% endfor %}
     </tbody>
@@ -50,5 +54,8 @@
     {% endfor %}
     </tbody>
     </table>
+    {% endif %}
+    {% else %}
+        <p>You can see details of sections in which you have a student enrolled (not this one).</p>
     {% endif %}
 {% endblock %}
