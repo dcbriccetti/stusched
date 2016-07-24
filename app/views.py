@@ -20,15 +20,12 @@ def courses(request):
 @login_required
 def students(request):
     user = request.user
-    if user:
-        if user.is_staff:
-            parents = Parent.objects.order_by('name')
-        else:
-            parents = Parent.objects.filter(users=user)
+    if user.is_staff:
+        parents = [p for p in Parent.objects.order_by('name') if p.active()]
     else:
-        parents = None
+        parents = Parent.objects.filter(users=user)
 
-    return render(request, 'app/students.html', {'parents': [p for p in parents if p.active()]})
+    return render(request, 'app/students.html', {'parents': parents})
 
 
 def sections(request):

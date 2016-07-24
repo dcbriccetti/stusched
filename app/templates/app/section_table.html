@@ -7,7 +7,9 @@
         <th>Hours / Day</th>
         <th>Days</th>
         <th>Num</th>
+        {% if user.is_staff %}
         <th>Names</th>
+        {% endif %}
         <th>Notes</th>
     </tr>
     </thead>
@@ -26,7 +28,9 @@
             <td>{{ section.hours_per_day }}</td>
             <td>{{ section.num_days }}</td>
             <td>{{ section.num_students }}</td>
+            {% if user.is_staff %}
             <td>{{ section.students }}</td>
+            {% endif %}
             <td>{{ section.notes }}</td>
         </tr>
     {% endfor %}
