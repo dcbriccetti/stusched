@@ -4,7 +4,7 @@
 {% block title %}{{ block.super }}{% endblock %}
 
 {% block content %}
-<img style="max-width: 100%; margin-bottom: 1em;" src="{% static "toppic.jpg" %}" alt="Picture of a programming class"/>
+<img style="max-width: 100%; margin-bottom: 1em;" src="/app/stusched/static/toppic.jpg" alt="Picture of a programming class"/>
 {% if user.is_authenticated %}
 <p><a class="btn btn-primary btn-lg" href="/app/logout">Log Out</a></p>
 {% endif %}

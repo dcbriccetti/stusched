@@ -76,7 +76,7 @@ class Student(models.Model):
 
     def age(self):
         years = self.age_years()
-        return "%.3f" % years if years else ''
+        return "%.2f" % years if years else ''
 
     def age_years(self):
         today = date.today()

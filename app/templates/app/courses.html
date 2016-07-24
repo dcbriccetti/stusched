@@ -3,7 +3,7 @@
 {% block title %}{{ block.super }} - Courses{% endblock %}
 
 {% block content %}
-<h1>Courses</h1>
+<h2>Courses</h2>
 {% if courses %}
     {% for course in courses %}
         <p>
@@ -17,4 +17,7 @@
 {% else %}
     <p>No courses are available.</p>
 {% endif %}
+    <h3>Suggest a Course</h3>
+    <p>Have a suggestion for a course?
+        Please <a href="mailto:daveb@davebsoft.com?subject=Course%20suggestion">send it.</a></p>
 {% endblock %}
