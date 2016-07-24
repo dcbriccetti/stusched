@@ -32,10 +32,11 @@ def students(request):
 
 
 def students_of_parent(user):
-    parents = Parent.objects.filter(users=user)
     stus = []
-    for p in parents:
-        stus += p.student_set.all()
+    if user.is_active:
+        parents = Parent.objects.filter(users=user)
+        for p in parents:
+            stus += p.student_set.all()
     return stus
 
 
