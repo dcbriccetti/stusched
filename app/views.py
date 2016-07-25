@@ -33,7 +33,7 @@ def students(request):
 
 def students_of_parent(user):
     stus = []
-    if user.is_active:
+    if user.is_active:  # Skip for anonymous user
         parents = Parent.objects.filter(users=user)
         for p in parents:
             stus += p.student_set.all()
