@@ -1,12 +1,14 @@
 from datetime import datetime
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib import messages
 from django.views.generic import View
 from .models import Course, Section, Parent
 from .models import Student as StudentModel
-from .forms import AuthenticationForm, NewUserForm, StudentForm
+from .forms import AuthenticationForm, NewUserForm, StudentForm, ParentForm
 
 
 class Index(View):
@@ -142,7 +144,40 @@ class Login(View):
                 return render(request, 'app/login.html', {'form': form, 'new_user_form': NewUserForm()})
 
 
-class Student(View):
+def valid_parent(user):
+    parents = Parent.objects.filter(users=user)
+    return parents[0] if parents else None
+
+
+class ParentView(LoginRequiredMixin, View):
+    def get(self, request):
+        parent = valid_parent(request.user)
+        if not parent:
+            return redirect('/app/')  # todo error
+
+        return render(request, 'app/parent.html', {
+            'form':       ParentForm(instance=parent),
+            'parent_id':  parent.id,
+        })
+
+    def post(self, request):
+        parent = valid_parent(request.user)
+        if not parent:
+            return redirect('/app/')  # todo error
+
+        form = ParentForm(data=request.POST, instance=parent)
+        if form.is_valid():
+            form.save()
+            messages.add_message(request, messages.INFO, 'Parent information saved.')
+            return redirect('/app/')
+        else:
+            return render(request, 'app/parent.html', {
+                'form':         form,
+                'parent_id':    parent.id
+            })
+
+
+class Student(LoginRequiredMixin, View):
     def get(self, request, id_str):
         if id_str == '0':
             parent = Parent.objects.filter(id=request.GET['parent_id']).first()
@@ -185,6 +220,7 @@ class Student(View):
                 saved_student.parent = parent
                 saved_student.save()
                 form.save_m2m()
+                messages.add_message(request, messages.INFO, 'Student information saved.')
             else:
                 return render(request, 'app/student.html', {
                     'form':         form,
@@ -201,4 +237,5 @@ class Student(View):
 
 def logOut(request):
     logout(request)
+    messages.add_message(request, messages.INFO, 'You are logged out.')
     return redirect('/')

@@ -4,24 +4,31 @@
 {% block title %}{{ block.super }}{% endblock %}
 
 {% block content %}
-<img style="max-width: 100%; margin-bottom: 1em;" src="{% static "toppic.jpg" %}" alt="Picture of a programming class"/>
-{% if user.is_authenticated %}
-<p><a class="btn btn-primary btn-sm" href="/app/logout">Log Out</a></p>
-{% endif %}
-    <h2>About</h2>
-    <p>Dave B’s Student Information System lets you do the following:</p>
-    <ul>
-    <li>Register yourself as the parent or guardian of one or more students interested in learning computer programming from Dave Briccetti</li>
-    <li>Provide information about each student:</li>
-        <ul>
-            <li>Name, birthdate, and optionally school and some other items</li>
-            <li>Any programming experience</li>
-            <li>What classes the student is interested in</li>
-            <li>When the student is available</li>
-        </ul>
-    <li>Browse available courses and sections (instances of courses)</li>
-    <li>See the history of your children’s attendance in course sections</li>
-    <li>Propose courses and sections</li>
-    <li>Enroll in course sections</li>
-    </ul>
+    <img style="max-width: 100%; margin-bottom: 1em;" src="{% static "toppic.jpg" %}"
+         alt="Picture of a programming class"/>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">About This System</h3>
+      </div>
+      <div class="panel-body">
+          <p>One of the challenges in teaching programming to kids is organizing the kids into
+              groups by ability, interest, budget, and availability. I am developing this system to help.
+              With it you can:</p>
+          <ul>
+              <li>Register yourself as the parent or guardian of one or more students interested in learning computer
+                  programming from <a href="http://davebsoft.com">Dave Briccetti</a>
+              </li>
+              <li>Provide information about each of your children you are seeking instruction for</li>
+              <li>Browse available courses and sections (instances of courses)</li>
+              <li>See the history of your children’s attendance in course sections</li>
+              <li>Propose courses</li>
+          </ul>
+          <p>Soon you will be able to:</p>
+          <ul>
+              <li>Propose course sections to help form groups</li>
+              <li>Enroll in course sections</li>
+          </ul>
+      </div>
+    </div>
 {% endblock %}

@@ -99,11 +99,22 @@ class NewUserForm(forms.Form):
         return code
 
 
+class ParentForm(ModelForm):
+    class Meta:
+        model = Parent
+        fields = ('name', 'phone', 'email', 'referred_by')
+
+    def __init__(self, *args, **kwargs):
+        super(ParentForm, self).__init__(*args, **kwargs)
+        self.fields['email'].required = True
+
+
 class StudentForm(ModelForm):
     class Meta:
         model = Student
-        fields = ('name', 'birthdate', 'school', 'email', 'wants_courses', 'when_available', 'notes')
+        fields = ('name', 'birthdate', 'grade_from_age', 'school', 'email', 'wants_courses', 'when_available', 'notes')
 
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)
-        self.fields['birthdate'].required = True
+        for name in ('birthdate', 'grade_from_age'):
+            self.fields[name].required = True
