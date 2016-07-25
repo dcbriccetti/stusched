@@ -5,7 +5,7 @@
 
 {% block content %}
 
-    <h1>Log In</h1>
+    <h2>Log In</h2>
     <form action="/app/login" method="post">
         {% csrf_token %}
         {% bootstrap_form form %}
@@ -14,7 +14,7 @@
         {% endbuttons %}
     </form>
 
-    <h1>Create New Account</h1>
+    <h2>Create New Account</h2>
     <form action="/app/login?create=y" method="post">
         {% csrf_token %}
         {% bootstrap_form new_user_form %}

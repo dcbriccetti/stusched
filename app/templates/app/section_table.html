@@ -1,12 +1,12 @@
 <table class="table">
     <thead>
     <tr>
-        <th>ID</th>
+        <th></th>
         <th>Course</th>
         <th>Start Time</th>
         <th>Hours / Day</th>
-        <th>Days</th>
-        <th>Num</th>
+        <th># Days</th>
+        <th># Stu</th>
         {% if user.is_staff %}
         <th>Names</th>
         {% endif %}
@@ -18,7 +18,7 @@
         <tr>
             <td>
                 {% if user.is_staff or section.id in viewable_section_ids %}
-                <a href='/app/section/{{ section.id }}'>{{ section.id }}</a>
+                <a href='/app/section/{{ section.id }}'><span class="glyphicon glyphicon-eye-open" title="View section details"></span></a>
                 {% endif %}
             </td>
             <td>
@@ -29,7 +29,7 @@
                 {% endif %}
             </td>
             <td>{{ section.start_time }}</td>
-            <td>{{ section.hours_per_day }}</td>
+            <td>{{ section.hours_per_day_formatted }}</td>
             <td>{{ section.num_days }}</td>
             <td>{{ section.num_students }}</td>
             {% if user.is_staff %}

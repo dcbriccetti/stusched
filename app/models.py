@@ -37,6 +37,10 @@ class Section(models.Model):
     def students(self):
         return ', '.join((s.name for s in self.student_set.all().order_by('name')))
 
+    def hours_per_day_formatted(self):
+        hpd = str(self.hours_per_day)
+        return hpd[:-3] if hpd.endswith('.00') else hpd
+
 
 class Parent(models.Model):
     name = models.CharField(max_length=100)

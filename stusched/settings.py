@@ -81,10 +81,10 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
 
-AUTH_PASSWORD_VALIDATORS = [{'NAME': 'django.contrib.auth.password_validation.' + validator} for validator in
-    ('UserAttributeSimilarityValidator', 'MinimumLengthValidator', 'CommonPasswordValidator', 'NumericPasswordValidator')]
+AUTH_PASSWORD_VALIDATORS = [{'NAME': 'django.contrib.auth.password_validation.%sValidator' % name} for name in
+    ('UserAttributeSimilarity', 'MinimumLength', 'CommonPassword', 'NumericPassword')]
 
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = 'NO_SSL' not in os.environ  # Don’t use HTTPS in development
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # For Heroku
 
 # Internationalization
