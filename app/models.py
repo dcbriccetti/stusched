@@ -64,18 +64,19 @@ class Parent(models.Model):
 
 
 class Student(models.Model):
-    name            = models.CharField(max_length=100)
+    name            = models.CharField(max_length=100, help_text='The student’s full name')
     active          = models.BooleanField(default=True)
-    birthdate       = models.DateField(null=True, blank=True)
-    grade_from_age  = models.IntegerField(null=True, blank=True)
-    school          = models.CharField(max_length=100, null=True, blank=True)
+    birthdate       = models.DateField(null=True, blank=True, help_text='Used so the system always knows the student’s current age')
+    grade_from_age  = models.IntegerField(null=True, blank=True,
+        help_text='This is the number to subtract from the student’s age on September 1st to find the grade (usually 5)')
+    school          = models.CharField(max_length=100, null=True, blank=True, help_text='This is nice for the teacher to know, but isn’t required')
     parent          = models.ForeignKey(Parent)
-    email           = models.EmailField(null=True, blank=True)
+    email           = models.EmailField(null=True, blank=True, help_text='This makes it more convenient for the teacher to communicate with the student, but isn’t required')
     aptitude        = models.IntegerField(null=True, blank=True)
     sections        = models.ManyToManyField(Section, blank=True)
-    wants_courses   = models.ManyToManyField(Course, blank=True)
-    when_available  = models.TextField(blank=True)
-    notes           = models.TextField(blank=True)
+    wants_courses   = models.ManyToManyField(Course, blank=True, help_text='Select zero or more')
+    when_available  = models.TextField(blank=True, help_text='Used in planning new course sections')
+    notes           = models.TextField(blank=True, help_text='Background on the student, including any previous programming experience; allergies, special emergency instructions, etc.')
     private_notes   = models.TextField(blank=True)
 
     def age(self):
