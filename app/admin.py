@@ -13,7 +13,7 @@ class StudentsInSectionInline(admin.TabularInline):
 
 class ParentAdmin(admin.ModelAdmin):
     ordering = ('name',)
-    list_display = ('name', 'user', 'active', 'phone', 'email', 'notes')
+    list_display = ('name', 'user', 'active', 'phone', 'email', 'referred_by', 'private_notes')
     search_fields = ('name',)
     inlines = [StudentInline]
 
