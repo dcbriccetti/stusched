@@ -6,7 +6,7 @@
 {% block content %}
 <img style="max-width: 100%; margin-bottom: 1em;" src="{% static "toppic.jpg" %}" alt="Picture of a programming class"/>
 {% if user.is_authenticated %}
-<p><a class="btn btn-primary btn-lg" href="/app/logout">Log Out</a></p>
+<p><a class="btn btn-primary btn-sm" href="/app/logout">Log Out</a></p>
 {% endif %}
     <h2>About</h2>
     <p>Dave B’s Student Information System lets you do the following:</p>

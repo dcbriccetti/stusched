@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -46,9 +47,14 @@ def parent_of_one_of_these_students(user, students):
 
 
 def sections(request):
+    include_all = request.GET.get('include', 'future') == 'all'
+    sections = Section.objects
+    if not include_all:
+        sections = sections.filter(start_time__gt=datetime.now())
     return render(request, 'app/sections.html', {
-        'sections': Section.objects.order_by('start_time'),
-        'viewable_section_ids': viewable_section_ids(request)
+        'sections':             sections.order_by('start_time'),
+        'viewable_section_ids': viewable_section_ids(request),
+        'include_all':          include_all
     })
 
 
@@ -101,7 +107,12 @@ def section(request, section_id):
 class Login(View):
     def get(self, request):
         form = AuthenticationForm()
-        new_user_form = NewUserForm()
+        data = {}
+        for name in ('name', 'email', 'parent_code'):
+            v = request.GET.get(name)
+            if v:
+                data[name] = v
+        new_user_form = NewUserForm(data)
         return render(request, 'app/login.html', {'form': form, 'new_user_form': new_user_form})
 
     def post(self, request):

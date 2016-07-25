@@ -1,8 +1,11 @@
 {% extends "app/base.html" %}
 
-{% block title %}{{ block.super }} - Proposed Course Sections{% endblock %}
+{% block title %}{{ block.super }} - Course Sections{% endblock %}
 
 {% block content %}
     <h2>Course Sections</h2>
     {% include "app/section_table.html" %}
+    {% if not include_all %}
+        <a class='btn btn-primary btn-sm' role="button" href='/app/sections?include=all'>Include Past Sections</a>
+    {% endif %}
 {% endblock %}

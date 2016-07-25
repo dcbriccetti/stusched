@@ -10,7 +10,10 @@
     <h2>{{ parent.name }}</h2>
     {% endif %}
     {% for student in parent.student_set.all %}
-        <h3><a href='/app/student/{{ student.id }}'>{{ student.name }}</a></h3>
+        <div>
+            <a href='/app/student/{{ student.id }}'><span title="Edit student profile" class="glyphicon glyphicon-edit"></span></a>
+            <strong style="font-size: 120%">{{ student.name }}</strong>
+        </div>
         <p>{% if student.age %}Age: {{ student.age }}{% endif %}{% if student.grade %}, Grade:
             {{ student.grade }}{% endif %}</p>
         {% if student.sections.count %}
