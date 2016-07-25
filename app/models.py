@@ -46,9 +46,10 @@ class Parent(models.Model):
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=100, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
-    notes = models.TextField(blank=True)
+    referred_by = models.CharField(max_length=200, null=True, blank=True, help_text='How you heard of Dave B’s Young Programmers: A person’s name, web search, Facebook, Meetup, etc.')
+    private_notes = models.TextField(blank=True)
     code  = models.CharField(max_length=100, null=True, blank=True)
-    # Set via: update app_parent set code = md5(random()::text) where code is null;
+    # Set via: update app_parent set code = md5(random()::text) where code = '';
     users = models.ManyToManyField(User, blank=True)
 
     def __str__(self):
