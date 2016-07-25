@@ -112,7 +112,7 @@ class Login(View):
             v = request.GET.get(name)
             if v:
                 data[name] = v
-        new_user_form = NewUserForm(data)
+        new_user_form = NewUserForm(data) if data else NewUserForm()
         return render(request, 'app/login.html', {'form': form, 'new_user_form': new_user_form})
 
     def post(self, request):
