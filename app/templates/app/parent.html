@@ -6,7 +6,7 @@
 {% block content %}
 
     <h2>Edit Parent</h2>
-    <form action="/app/parent" method="post">
+    <form action="{% url 'parent' %}" method="post">
         {% csrf_token %}
         {% bootstrap_form form %}
         {% buttons %}

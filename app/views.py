@@ -1,6 +1,7 @@
 from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, redirect
+from django.http import Http404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -180,18 +181,12 @@ class ParentView(LoginRequiredMixin, View):
 class Student(LoginRequiredMixin, View):
     def get(self, request, id_str):
         if id_str == '0':
-            parent = Parent.objects.filter(id=request.GET['parent_id']).first()
-            if not parent:
-                return redirect('/app/')  # todo error
-
+            parent = get_object_or_404(Parent, pk=request.GET['parent_id'])
             form = StudentForm()
             student_id = 0
         else:
             student_id = int(id_str)
-            student = StudentModel.objects.filter(id=student_id).first()
-            if not student:
-                return redirect('/app/')  # todo error
-
+            student = get_object_or_404(StudentModel, pk=student_id)
             form = StudentForm(instance=student)
             parent = student.parent
 
@@ -202,7 +197,7 @@ class Student(LoginRequiredMixin, View):
                 'student_id': student_id,
             })
         else:
-            return redirect('/app/')
+            raise Http404('That is not a student you can edit')
 
     def post(self, request, id_str):
         if id_str == '0':
@@ -227,6 +222,8 @@ class Student(LoginRequiredMixin, View):
                     'student_id':   student_id,
                     'parent_id':    parent.id
                 })
+        else:
+            raise Http404('That is not a student you can edit')
 
         return redirect('/app/students')
 
