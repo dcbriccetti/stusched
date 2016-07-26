@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Count
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -18,7 +19,14 @@ class Index(View):
 
 
 def courses(request):
-    return render(request, 'app/courses.html', {'courses': Course.objects.filter(active=True).order_by('name')})
+    wci = 'wants_courses__id'
+    wc = StudentModel.objects.values(wci).annotate(total=Count('id'))
+    want_by_course = {e[wci]: e['total'] for e in wc if e[wci]}
+
+    return render(request, 'app/courses.html', {
+        'courses':          Course.objects.filter(active=True).order_by('name'),
+        'want_by_course':   want_by_course,
+    })
 
 
 @login_required

@@ -1,19 +1,33 @@
 {% extends "app/base.html" %}
+{% load vars %}
 
 {% block title %}{{ block.super }} - Courses{% endblock %}
 
 {% block content %}
 <h2>Courses</h2>
 {% if courses %}
+    <table class="table table-nonfluid">
+    <thead>
+    <tr>
+        <th>Course Name</th>
+        <th>Students Interested</th>
+    </tr>
+    </thead>
+    <tbody>
     {% for course in courses %}
-        <p>
+        <tr>
+        <td>
         {% if course.url %}
         <a href={{ course.url }}>{{ course.name }}</a>
         {% else %}
         {{ course.name }}
         {% endif %}
-        </p>
+        </td>
+        <td>{{ want_by_course|get_item:course.id }}</td>
+        </tr>
     {% endfor %}
+    </tbody>
+    </table>
 {% else %}
     <p>No courses are available.</p>
 {% endif %}
