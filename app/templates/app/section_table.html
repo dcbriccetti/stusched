@@ -2,6 +2,7 @@
     <thead>
     <tr>
         <th></th>
+        <th>ID</th>
         <th>Course</th>
         <th>Price</th>
         <th>Start Time</th>
@@ -22,6 +23,7 @@
                 <a href='/app/section/{{ section.id }}'><span class="glyphicon glyphicon-eye-open" title="View section details"></span></a>
                 {% endif %}
             </td>
+            <td>{{ section.id }}</td>
             <td>
                 {% if section.course.url %}
                     <a href={{ section.course.url }}>{{ section.course.name }}</a>
