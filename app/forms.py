@@ -34,6 +34,7 @@ class AuthenticationForm(forms.Form):
         self.username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
         if self.fields['username'].label is None:
             self.fields['username'].label = capfirst(self.username_field.verbose_name)
+        self.fields['username'].widget.attrs['autofocus'] = 'autofocus'
 
     def clean(self):
         username = self.cleaned_data.get('username')

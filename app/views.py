@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count
 from django.http import Http404
@@ -11,6 +12,8 @@ from django.views.generic import View
 from .models import Course, Section, Parent
 from .models import Student as StudentModel
 from .forms import AuthenticationForm, NewUserForm, StudentForm, ParentForm
+
+log = logging.getLogger(__name__)
 
 
 class Index(View):
@@ -124,7 +127,11 @@ class Login(View):
             if v:
                 data[name] = v
         new_user_form = NewUserForm(data) if data else NewUserForm()
-        return render(request, 'app/login.html', {'form': form, 'new_user_form': new_user_form})
+        return render(request, 'app/login.html', {
+            'form':             form,
+            'new_user_form':    new_user_form,
+            'next':             request.GET.get('next')
+        })
 
     def post(self, request):
         if 'name' in request.POST:
@@ -141,16 +148,27 @@ class Login(View):
                     parent = Parent(name=cd['name'], email=cd['email'])
                     parent.save()
                 parent.users.add(user)
-                return redirect('/app/')
+                log.info('%s %s created and logged in', user, parent.name)
+                messages.add_message(request, messages.INFO, 'Account created')
+                return redirect(request.POST.get('next') or '/app/')
             else:
                 return render(request, 'app/login.html', {'form': AuthenticationForm(), 'new_user_form': form})
         else:
             form = AuthenticationForm(data=request.POST)
             if form.is_valid():
                 login(request, form.get_user())
-                return redirect('/app/')
+                log.info('%s %s logged in', request.user, valid_parent(request.user).name)
+                return redirect(request.POST.get('next') or '/app/')
             else:
                 return render(request, 'app/login.html', {'form': form, 'new_user_form': NewUserForm()})
+
+
+def logOut(request):
+    name = request.user.username
+    logout(request)
+    messages.add_message(request, messages.INFO, 'You are logged out.')
+    log.info('%s logged out', name)
+    return redirect('/')
 
 
 def valid_parent(user):
@@ -177,7 +195,9 @@ class ParentView(LoginRequiredMixin, View):
         form = ParentForm(data=request.POST, instance=parent)
         if form.is_valid():
             form.save()
-            messages.add_message(request, messages.INFO, 'Parent information saved.')
+            msg = 'Parent information saved.'
+            messages.add_message(request, messages.INFO, msg)
+            log.info('%s %s %s', request.user, parent.name, msg)
             return redirect('/app/')
         else:
             return render(request, 'app/parent.html', {
@@ -223,7 +243,9 @@ class Student(LoginRequiredMixin, View):
                 saved_student.parent = parent
                 saved_student.save()
                 form.save_m2m()
-                messages.add_message(request, messages.INFO, 'Student information saved.')
+                msg = 'Student information saved.'
+                messages.add_message(request, messages.INFO, msg)
+                log.info('%s %s: %s %s', request.user, parent.name, saved_student.name, msg)
             else:
                 return render(request, 'app/student.html', {
                     'form':         form,
@@ -238,9 +260,3 @@ class Student(LoginRequiredMixin, View):
     @staticmethod
     def _student_ok(parent, user):
         return user.is_staff or user in parent.users.all()
-
-
-def logOut(request):
-    logout(request)
-    messages.add_message(request, messages.INFO, 'You are logged out.')
-    return redirect('/')
