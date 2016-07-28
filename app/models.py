@@ -98,10 +98,10 @@ class Student(models.Model):
         return grade
 
     def sections_taken(self):
-        return ', '.join([section.course.name for section in self.sections.all()])
+        return ', '.join([section.course.name for section in self.sections.all().order_by('course__name')])
 
     def courses_wanted(self):
-        return ', '.join([course.name for course in self.wants_courses.all()])
+        return ', '.join([course.name for course in self.wants_courses.all().order_by('name')])
 
     @property
     def sections_by_time(self):
