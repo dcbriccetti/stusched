@@ -169,7 +169,7 @@ class Login(View):
         return render(request, 'app/login.html', {
             'form':             form,
             'new_user_form':    new_user_form,
-            'next':             request.GET.get('next')
+            'next':             request.GET.get('next', '')
         })
 
     def post(self, request):
