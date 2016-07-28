@@ -1,6 +1,7 @@
 from datetime import datetime
 import logging
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.urlresolvers import reverse
 from django.db.models import Count
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
@@ -21,15 +22,42 @@ class Index(View):
         return render(request, 'app/index.html')
 
 
-def courses(request):
-    wci = 'wants_courses__id'
-    wc = StudentModel.objects.values(wci).annotate(total=Count('id'))
-    want_by_course = {e[wci]: e['total'] for e in wc if e[wci]}
+class Courses(View):
+    def get(self, request):
+        wci = 'wants_courses__id'
+        wc = StudentModel.objects.values(wci).annotate(total=Count('id'))
+        want_by_course = {e[wci]: e['total'] for e in wc if e[wci]}
 
-    return render(request, 'app/courses.html', {
-        'courses':          Course.objects.filter(active=True).order_by('name'),
-        'want_by_course':   want_by_course,
-    })
+        return render(request, 'app/courses.html', {
+            'courses':          Course.objects.filter(active=True).order_by('name'),
+            'want_by_course':   want_by_course,
+            'student_wants':    get_student_wants(request.user),
+        })
+
+    def post(self, request):
+        user = request.user
+        wants_by_student = {csw.student: csw for csw in get_student_wants(user)}
+
+        for student in students_of_parent(user):
+            old_wants = wants_by_student[student].course_ids
+            new_wants = set()
+            # The checkbox names are in the form want-<student ID>-<course ID>
+            for key_parts in (key.split('-') for key, _ in request.POST.items() if key.startswith('want-')):
+                if int(key_parts[1]) == student.id:
+                    new_wants.add(int(key_parts[2]))
+
+            additions = new_wants - old_wants
+            removals  = old_wants - new_wants
+
+            for addition in additions:
+                course = Course.objects.get(pk=addition)
+                student.wants_courses.add(course)
+
+            for removal in removals:
+                course = Course.objects.get(pk=removal)
+                student.wants_courses.remove(course)
+
+        return redirect(reverse('courses'))
 
 
 @login_required
@@ -48,16 +76,27 @@ def students(request):
 
 def students_of_parent(user):
     stus = []
-    if user.is_active:  # Skip for anonymous user
+    if user.is_active and not user.is_staff:  # Skip for anonymous or staff user
         parents = Parent.objects.filter(users=user)
         for p in parents:
-            stus += p.student_set.all()
+            stus += p.student_set.all().order_by('name')
     return stus
 
 
 def parent_of_one_of_these_students(user, students):
     stus = students_of_parent(user)
     return bool(set(stus) & set(students))
+
+
+def get_student_wants(user):
+    class StudentCourseWants:
+        def __init__(self, student, course_ids):
+            self.student = student
+            self.course_ids = course_ids
+
+    students = students_of_parent(user)
+    return [StudentCourseWants(student, set((course.id for course in student.wants_courses.all())))
+            for student in students]
 
 
 def sections(request):
@@ -157,7 +196,8 @@ class Login(View):
             form = AuthenticationForm(data=request.POST)
             if form.is_valid():
                 login(request, form.get_user())
-                log.info('%s %s logged in', request.user, valid_parent(request.user).name)
+                vp = valid_parent(request.user)
+                log.info('%s %s logged in', request.user, vp.name if vp else '[No parent]')
                 return redirect(request.POST.get('next') or '/app/')
             else:
                 return render(request, 'app/login.html', {'form': form, 'new_user_form': NewUserForm()})
