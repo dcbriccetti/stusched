@@ -31,7 +31,11 @@
                     {{ section.course.name }}
                 {% endif %}
             </td>
-            <td>${{ section.price }}</td>
+            <td>
+                {% if section.price %}
+                ${{ section.price }}
+                {% endif %}
+            </td>
             <td>{{ section.start_time }}</td>
             <td>{{ section.hours_per_day_formatted }}</td>
             <td>{{ section.num_days }}</td>
