@@ -74,7 +74,7 @@ class Student(models.Model):
     parent          = models.ForeignKey(Parent)
     email           = models.EmailField(null=True, blank=True, help_text='This makes it more convenient for the teacher to communicate with the student, but isn’t required.')
     aptitude        = models.IntegerField(null=True, blank=True)
-    sections        = models.ManyToManyField(Section, blank=True)
+    sections        = models.ManyToManyField(Section, blank=True, through='StudentSectionAssignment')
     wants_courses   = models.ManyToManyField(Course, blank=True, help_text='Select zero or more.')
     when_available  = models.TextField(blank=True, help_text='Used in planning new course sections.')
     notes           = models.TextField(blank=True, help_text='Background on the student, including any previous programming experience; allergies, special emergency instructions, etc.')
@@ -127,3 +127,18 @@ class Knows(models.Model):
     def __str__(self):
         return '%s %s %d' % (self.student.name, self.item.name, self.quantity)
 
+
+SS_STATUSES = ((1, 'Applied'), (2, 'Accepted'), (3, 'Rejected'))
+
+
+class StudentSectionAssignment(models.Model):
+    class Meta:
+        db_table = 'app_student_section'
+
+    student     = models.ForeignKey(Student, on_delete=models.CASCADE)
+    section     = models.ForeignKey(Section, on_delete=models.CASCADE)
+    status      = models.IntegerField(choices=SS_STATUSES)
+    changed     = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return '%s %s' % (self.student.name, str(self.section))
