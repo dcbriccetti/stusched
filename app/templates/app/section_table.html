@@ -1,9 +1,11 @@
+{% load relationships %}
+
 <table class="table">
     <thead>
     <tr>
         <th></th>
-        <th>ID</th>
         <th>Course</th>
+        <th>Status</th>
         <th>Price</th>
         <th>Start Time</th>
         <th>Hours / Day</th>
@@ -11,6 +13,9 @@
         <th># Stu</th>
         {% if user.is_staff %}
         <th>Names</th>
+        {% endif %}
+        {% if students_of_user and user.is_authenticated and not user.is_staff %}
+        <th>Your Students</th>
         {% endif %}
         <th>Notes</th>
     </tr>
@@ -22,8 +27,12 @@
                 {% if user.is_staff or section.id in viewable_section_ids %}
                 <a href='/app/section/{{ section.id }}'><span class="glyphicon glyphicon-eye-open" title="View section details"></span></a>
                 {% endif %}
+
+                {% if section.registration_open and user.is_authenticated %}
+                    <a title='Change Registration'
+                       class='btn btn-primary btn-xs' role="button" href='/app/section/{{ section.id }}/register'>Reg</a>
+                {% endif %}
             </td>
-            <td>{{ section.id }}</td>
             <td>
                 {% if section.course.url %}
                     <a href={{ section.course.url }}>{{ section.course.name }}</a>
@@ -31,6 +40,7 @@
                     {{ section.course.name }}
                 {% endif %}
             </td>
+            <td>{{ section.scheduled_status_string }}</td>
             <td>
                 {% if section.price %}
                 ${{ section.price }}
@@ -42,6 +52,9 @@
             <td>{{ section.num_students }}</td>
             {% if user.is_staff %}
             <td>{{ section.students }}</td>
+            {% endif %}
+            {% if students_of_user and user.is_authenticated and not user.is_staff %}
+            <td>{{ section.student_objects|students_intersection:students_of_user }}</td>
             {% endif %}
             <td>{{ section.notes }}</td>
         </tr>

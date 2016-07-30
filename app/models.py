@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -31,11 +31,23 @@ class Section(models.Model):
     def __str__(self):
         return '%s %s' % (self.start_time, self.course.name)
 
+    def has_passed(self):
+        return datetime.now() > self.start_time
+
+    def scheduled_status_string(self):
+        return '' if self.has_passed() else [st[1] for st in STATUSES if st[0] == self.scheduled_status][0]
+
+    def registration_open(self):
+        return not self.has_passed()  # Todo is it full?
+
     def num_students(self):
         return self.student_set.count()
 
     def students(self):
         return ', '.join((s.name for s in self.student_set.all().order_by('name')))
+
+    def student_objects(self):
+        return self.student_set.all().order_by('name')
 
     def hours_per_day_formatted(self):
         hpd = str(self.hours_per_day)

@@ -10,6 +10,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.views.generic import View
+from app.students import students_of_parent
+from app.reg import RegistrationSetter
 from .models import Course, Section, Parent
 from .models import Student as StudentModel
 from .forms import AuthenticationForm, NewUserForm, StudentForm, ParentForm
@@ -37,6 +39,7 @@ class Courses(View):
     def post(self, request):
         user = request.user
         wants_by_student = {csw.student: csw for csw in get_student_wants(user)}
+        changed = False
 
         for student in students_of_parent(user):
             old_wants = wants_by_student[student].course_ids
@@ -52,10 +55,17 @@ class Courses(View):
             for addition in additions:
                 course = Course.objects.get(pk=addition)
                 student.wants_courses.add(course)
+                changed = True
 
             for removal in removals:
                 course = Course.objects.get(pk=removal)
                 student.wants_courses.remove(course)
+                changed = True
+
+        if changed:
+            msg = 'Course interest settings saved.'
+            messages.add_message(request, messages.INFO, msg)
+            log.info('%s: %s', request.user, msg)
 
         return redirect(reverse('courses'))
 
@@ -72,15 +82,6 @@ def students(request):
         'parents': parents,
         'viewable_section_ids': viewable_section_ids(request),
     })
-
-
-def students_of_parent(user):
-    stus = []
-    if user.is_active and not user.is_staff:  # Skip for anonymous or staff user
-        parents = Parent.objects.filter(users=user)
-        for p in parents:
-            stus += p.student_set.all().order_by('name')
-    return stus
 
 
 def parent_of_one_of_these_students(user, students):
@@ -107,7 +108,8 @@ def sections(request):
     return render(request, 'app/sections.html', {
         'sections':             sections.order_by('start_time'),
         'viewable_section_ids': viewable_section_ids(request),
-        'include_all':          include_all
+        'include_all':          include_all,
+        'students_of_user':     students_of_parent(request.user)
     })
 
 
@@ -300,3 +302,21 @@ class Student(LoginRequiredMixin, View):
     @staticmethod
     def _student_ok(parent, user):
         return user.is_staff or user in parent.users.all()
+
+
+class Register(LoginRequiredMixin, View):
+    def get(self, request, section_id):
+        rs = RegistrationSetter(request, section_id)
+
+        return render(request, 'app/section_reg.html', {
+            'section':  rs.section,
+            'students': rs.pstudents,
+            'reg_ids':  rs.registered_children_ids
+        })
+
+    def post(self, request, section_id):
+        rs = RegistrationSetter(request, section_id)
+        for student in rs.pstudents:
+            rs.set(student, 'reg-%s' % student.id in request.POST)
+
+        return redirect('/app/section/%s/register' % section_id)

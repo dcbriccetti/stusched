@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^student$',   views.Student.as_view()),
     url(r'^student/([0-9]+)$', views.Student.as_view()),
     url(r'^section/([0-9]+)$', views.section,       name='section'),
+    url(r'^section/([0-9]+)/register$', views.Register.as_view(), name='register'),
     url(r'^students$',  views.students,             name='students'),
     url(r'^sections$',  views.sections,             name='sections'),
 ]
