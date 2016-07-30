@@ -140,13 +140,9 @@ LOGGING = {
         },
     },
     'loggers': {
-        'django': {
+        key: {
             'handlers': ['console'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-        },
-        'app.views': {
-            'handlers': ['console'],
-            'level': os.getenv('APP_LOG_LEVEL', 'INFO'),
-        },
+        } for key in ('app.views', 'app.reg', 'app.models', 'app.students')
     },
 }
