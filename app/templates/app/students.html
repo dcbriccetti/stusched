@@ -10,15 +10,17 @@
     <h2>{{ parent.name }}</h2>
     {% endif %}
     {% for student in parent.student_set.all %}
-        <div>
-            <a href='/app/student/{{ student.id }}'><span title="Edit student profile" class="glyphicon glyphicon-edit"></span></a>
-            <strong style="font-size: 120%">{{ student.name }}</strong>
+        <div class="well">
+            <div>
+                <a href='/app/student/{{ student.id }}'><span title="Edit student profile" class="glyphicon glyphicon-edit"></span></a>
+                <strong style="font-size: 120%">{{ student.name }}</strong>
+            </div>
+            <p>{% if student.age %}Age: {{ student.age }}{% endif %}{% if student.grade %}, Grade:
+                {{ student.grade }}{% endif %}</p>
+            {% if student.sections.count %}
+            {% include "app/section_table.html" with sections=student.sections_by_time %}
+            {% endif %}
         </div>
-        <p>{% if student.age %}Age: {{ student.age }}{% endif %}{% if student.grade %}, Grade:
-            {{ student.grade }}{% endif %}</p>
-        {% if student.sections.count %}
-        {% include "app/section_table.html" with sections=student.sections_by_time %}
-        {% endif %}
     {% endfor %}
     <a class='btn btn-primary btn-sm' role="button" href='/app/student/0?parent_id={{ parent.id }}'>Add a student</a>
 {% endfor %}
