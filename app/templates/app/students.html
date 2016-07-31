@@ -11,13 +11,21 @@
     {% endif %}
     {% for student in parent.student_set.all %}
         <div class="well">
-            <div>
+            <h3 style="margin-top: 0">
                 <a href='/app/student/{{ student.id }}'><span title="Edit student profile" class="glyphicon glyphicon-edit"></span></a>
-                <strong style="font-size: 120%">{{ student.name }}</strong>
-            </div>
-            <p>{% if student.age %}Age: {{ student.age }}{% endif %}{% if student.grade %}, Grade:
-                {{ student.grade }}{% endif %}</p>
+                {{ student.name }}
+            </h3>
+            <dl class="dl-horizontal">
+                {% if student.age %}
+                    <dt>Age</dt><dd>{{ student.age }}</dd>
+                {% endif %}
+                {% if student.grade %}<dt>Grade</dt><dd>{{ student.grade }}</dd>{% endif %}
+                <dt>Courses wanted</dt><dd>{{ student.courses_wanted }}</dd>
+                <dt>When available</dt><dd>{{ student.when_available }}</dd>
+                <dt>Notes</dt><dd>{{ student.notes }}</dd>
+            </dl>
             {% if student.sections.count %}
+                <h4>Enrollments</h4>
             {% include "app/section_table.html" with sections=student.sections_by_time %}
             {% endif %}
         </div>

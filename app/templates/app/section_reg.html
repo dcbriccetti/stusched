@@ -4,19 +4,20 @@
 {% block title %}{{ block.super }} - Section Registrations{% endblock %}
 
 {% block content %}
-    <h2>Register Your Children</h2>
-    <h3>{{ section.course.name }}</h3>
+    <h2>Register For {{ section.course.name }}</h2>
     <h4>{{ section.start_time }}</h4>
 
     <form action="/app/section/{{ section.id }}/register" method="post">
         {% csrf_token %}
         {% for student in students %}
-        <h4>{{ student }}</h4>
-            <input id="reg-{{ student.id }}" name="reg-{{ student.id }}" type="checkbox"
-            {% if student.id in reg_ids %}
-                checked
-            {% endif %}
-            /> <label for="reg-{{ student.id }}">Enrolled</label>
+        <div class="well well-sm">
+            <h4>{{ student }}</h4>
+                <input id="reg-{{ student.id }}" name="reg-{{ student.id }}" type="checkbox"
+                {% if student.id in reg_ids %}
+                    checked
+                {% endif %}
+                /> <label for="reg-{{ student.id }}">Enrolled</label>
+        </div>
         {% endfor %}
         {% buttons %}
             <button type="submit" class="btn btn-primary">Save Changes</button>
