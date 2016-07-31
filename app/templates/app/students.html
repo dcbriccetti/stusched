@@ -4,7 +4,11 @@
 
 {% block content %}
 <h2>Students</h2>
-{% for parent in parents %}
+    <p>For all students, please provide information on the courses they want
+    and when they are available. This information drives the scheduling process.</p>
+    {% include 'app/how-choose-course.html' %}
+
+    {% for parent in parents %}
     {% if user.is_staff %}
     <hr style="border: medium black solid">
     <h2>{{ parent.name }}</h2>
