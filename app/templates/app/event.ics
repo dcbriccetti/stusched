@@ -1,0 +1,11 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//hacksw/handcal//NONSGML v1.0//EN
+BEGIN:VEVENT
+UID:dbsis-section-{{ section.id }}@davebsoft.com
+DTSTART:{{ section.start_time|date:"Ymd\THis" }}
+DTEND:{{ section.end_time|date:"Ymd\THis" }}
+RRULE:FREQ=DAILY;COUNT={{ section.num_days }}
+SUMMARY:{{ section.course }}
+END:VEVENT
+END:VCALENDAR

@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -52,6 +52,10 @@ class Section(models.Model):
     def hours_per_day_formatted(self):
         hpd = str(self.hours_per_day)
         return hpd[:-3] if hpd.endswith('.00') else hpd
+
+    def end_time(self):
+        t = self.start_time + timedelta(minutes=int(self.hours_per_day * 60))
+        return t
 
 
 class Parent(models.Model):

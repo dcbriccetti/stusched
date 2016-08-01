@@ -320,3 +320,13 @@ class Register(LoginRequiredMixin, View):
             rs.set(student, 'reg-%s' % student.id in request.POST)
 
         return redirect('/app/section/%s/register' % section_id)
+
+
+class Calendar(View):
+    def get(self, request, section_id):
+        section = Section.objects.filter(pk=section_id).first()
+        response = render(request, "app/event.ics", {
+            'section': section,
+        }, content_type="text/icalendar")
+        response['Content-Disposition'] = 'attachment; filename="event.ics"'
+        return response
