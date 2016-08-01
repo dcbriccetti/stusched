@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
@@ -102,11 +102,11 @@ def get_student_wants(user):
 
 def sections(request):
     include_all = request.GET.get('include', 'future') == 'all'
-    sections = Section.objects
+    sections = list(Section.objects.all().order_by('-start_time'))
     if not include_all:
-        sections = sections.filter(start_time__gt=datetime.now())
+        sections = (s for s in sections if not s.start_time + timedelta(days=s.num_days) < datetime.now())
     return render(request, 'app/sections.html', {
-        'sections':             sections.order_by('start_time'),
+        'sections':             sections,
         'viewable_section_ids': viewable_section_ids(request),
         'include_all':          include_all,
         'students_of_user':     students_of_parent(request.user)
