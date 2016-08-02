@@ -13,8 +13,10 @@ class RegistrationSetter:
         self.section = Section.objects.get(pk=section_id)
         self.pstudents = students_of_parent(request.user)
         self.pstudent_ids = set((s.id for s in self.pstudents))
-        self.registered_children_ids = [ssa.student_id
-            for ssa in StudentSectionAssignment.objects.filter(section_id=section_id) if ssa.student_id in self.pstudent_ids]
+        ssas = StudentSectionAssignment.objects.filter(section_id=section_id).order_by('changed')
+        waitlisted = ssas[self.section.max_students:]
+        self.registered_children_ids = [ssa.student_id for ssa in ssas if ssa.student_id in self.pstudent_ids]
+        self.waitlisted_children_ids = [ssa.student_id for ssa in waitlisted if ssa.student_id in self.pstudent_ids]
 
     def set(self, student, turn_on):
         current_assignment = StudentSectionAssignment.objects.filter(student=student, section=self.section)

@@ -16,7 +16,12 @@
                 {% if student.id in reg_ids %}
                     checked
                 {% endif %}
-                /> <label for="reg-{{ student.id }}">Enrolled</label>
+                /> <label for="reg-{{ student.id }}">
+                {% if student.id in waitlisted_ids %}
+                    Waitlisted
+                {% else %}
+                    Enrolled
+                {% endif %}</label>
         </div>
         {% endfor %}
         {% buttons %}

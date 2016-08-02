@@ -309,9 +309,10 @@ class Register(LoginRequiredMixin, View):
         rs = RegistrationSetter(request, section_id)
 
         return render(request, 'app/section_reg.html', {
-            'section':  rs.section,
-            'students': rs.pstudents,
-            'reg_ids':  rs.registered_children_ids
+            'section':          rs.section,
+            'students':         rs.pstudents,
+            'reg_ids':          rs.registered_children_ids,
+            'waitlisted_ids':   rs.waitlisted_children_ids,
         })
 
     def post(self, request, section_id):
