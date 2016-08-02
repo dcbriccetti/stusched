@@ -49,8 +49,19 @@
             <td>{{ section.start_time }}</td>
             <td>{{ section.hours_per_day_formatted }}</td>
             <td>{{ section.num_days }}</td>
-            <td><span class='text-muted' style="font-size: 70%">{{ section.min_students }} ≤ </span>{{ section.num_students }}
-                <span class='text-muted' style="font-size: 70%"> ≤ {{ section.max_students }}</span></td>
+            <td>
+                <span class='text-muted' style="font-size: 70%">{{ section.min_students }} ≤ </span>
+                <span
+                    {% if section.num_students >= section.min_students and section.num_students <= section.max_students %}
+                    class="text-success"
+                    {% else %}
+                    class="text-danger"
+                    {% endif %}
+                >
+                {{ section.num_students }}
+                </span>
+                <span class='text-muted' style="font-size: 70%"> ≤ {{ section.max_students }}</span>
+            </td>
             {% if user.is_staff %}
             <td>{{ section.students }}</td>
             {% endif %}
