@@ -29,8 +29,8 @@
                 <dt>Notes</dt><dd>{{ student.notes }}</dd>
             </dl>
             {% if student.sections.count %}
-                <h4>Enrollments</h4>
-            {% include "app/section_table.html" with sections=student.sections_by_time %}
+            <h4>Enrollments</h4>
+            {% include "app/section_table.html" with section_rows=student.section_rows_by_time %}
             {% endif %}
         </div>
     {% endfor %}

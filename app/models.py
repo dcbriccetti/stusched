@@ -120,8 +120,9 @@ class Student(models.Model):
         return ', '.join([course.name for course in self.wants_courses.all().order_by('name')])
 
     @property
-    def sections_by_time(self):
-        return self.sections.all().order_by('start_time')
+    def section_rows_by_time(self):
+        from app.views import make_section_rows  # Avoid a cyclical dependency
+        return make_section_rows(None, self.sections.all().order_by('start_time'))
 
     def __str__(self):
         return self.name.__str__()
@@ -144,7 +145,9 @@ class Knows(models.Model):
         return '%s %s %d' % (self.student.name, self.item.name, self.quantity)
 
 
-SS_STATUSES = ((1, 'Applied'), (2, 'Accepted'), (3, 'Rejected'))
+SS_STATUS_ACCEPTED = 2
+SS_STATUSES = ((1, 'Applied'), (SS_STATUS_ACCEPTED, 'Accepted'), (3, 'Rejected'))
+SS_STATUSES_BY_ID = {item[0]: item[1] for item in SS_STATUSES}
 
 
 class StudentSectionAssignment(models.Model):
@@ -158,3 +161,15 @@ class StudentSectionAssignment(models.Model):
 
     def __str__(self):
         return '%s %s' % (self.student.name, str(self.section))
+
+
+class AugmentedSsa:
+    'Provide a StudentSectionAssignment along with whether the student is waitlisted'
+    def __init__(self, ssa, waitlisted):
+        self.ssa = ssa
+        self.waitlisted = waitlisted
+
+def augmented_student_section_assignments(section):
+    'Return AugmentedSsa objects for a section'
+    ssas = StudentSectionAssignment.objects.filter(section_id=section.id).order_by('changed')
+    return [AugmentedSsa(ssa, seq >= ssa.section.max_students) for seq, ssa in enumerate(ssas)]

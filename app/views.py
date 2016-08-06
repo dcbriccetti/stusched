@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import logging
+from itertools import groupby
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.db.models import Count
@@ -11,8 +12,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.views.generic import View
 from app.students import students_of_parent
-from app.reg import RegistrationSetter
-from .models import Course, Section, Parent
+from .models import Course, Section, Parent, SS_STATUSES_BY_ID, SS_STATUS_ACCEPTED, augmented_student_section_assignments
 from .models import Student as StudentModel
 from .forms import AuthenticationForm, NewUserForm, StudentForm, ParentForm
 
@@ -80,7 +80,7 @@ def students(request):
 
     return render(request, 'app/students.html', {
         'parents': parents,
-        'viewable_section_ids': viewable_section_ids(request),
+        'get_viewable_section_ids': get_viewable_section_ids(request.user),
     })
 
 
@@ -100,23 +100,51 @@ def get_student_wants(user):
             for student in students]
 
 
+def make_section_rows(user, sections):
+    sop = students_of_parent(user) if user else []
+
+    class SectionRow:
+        def __init__(self, section, viewable):
+            self.section = section
+            self.viewable = viewable
+
+            def status_group_names():
+                aug_ssas = augmented_student_section_assignments(section)
+                def status_from_assa(assa): return assa.ssa.status
+                aug_ssas.sort(key=status_from_assa)
+                num_statuses = len(set((assa.ssa.status for assa in aug_ssas)))
+
+                for status_id, grouped_assas in groupby(aug_ssas, status_from_assa):
+                    def fmt_name(assa):
+                        return assa.ssa.student.name + (' (waitlist)' if assa.waitlisted else '')
+                    names = [fmt_name(assa) for assa in grouped_assas if not user or user.is_staff or assa.ssa.student in sop]
+                    if names:
+                        names.sort()
+                        status_heading = '%s: ' % SS_STATUSES_BY_ID[status_id] if \
+                            num_statuses > 1 or status_id != SS_STATUS_ACCEPTED else ''
+                        yield '%s%s' % (status_heading, ', '.join(names))
+
+            self.students = ', '.join(status_group_names())
+
+    viewable_section_ids = get_viewable_section_ids(user)
+    return [SectionRow(section, section.id in viewable_section_ids) for section in sections]
+
+
 def sections(request):
-    include_all = request.GET.get('include', 'future') == 'all'
+    include_past_sections = request.GET.get('include', 'future') == 'all'
     sections = list(Section.objects.all().order_by('-start_time'))
-    if not include_all:
-        sections = (s for s in sections if not s.start_time + timedelta(days=s.num_days) < datetime.now())
+    if not include_past_sections:
+        sections = [s for s in sections if not s.start_time + timedelta(days=s.num_days) < datetime.now()]
     return render(request, 'app/sections.html', {
-        'sections':             sections,
-        'viewable_section_ids': viewable_section_ids(request),
-        'include_all':          include_all,
-        'students_of_user':     students_of_parent(request.user)
+        'section_rows':             make_section_rows(request.user, sections),
+        'include_past_sections':    include_past_sections,
     })
 
 
-def viewable_section_ids(request):
+def get_viewable_section_ids(user):
     viewable_section_ids = set()
-    if request.user and not request.user.is_staff:
-        for stu in students_of_parent(request.user):
+    if user and not user.is_staff:
+        for stu in students_of_parent(user):
             for section in stu.sections.all():
                 viewable_section_ids.add(section.id)
     return viewable_section_ids
@@ -306,6 +334,7 @@ class Student(LoginRequiredMixin, View):
 
 class Register(LoginRequiredMixin, View):
     def get(self, request, section_id):
+        from app.reg import RegistrationSetter
         rs = RegistrationSetter(request, section_id)
 
         return render(request, 'app/section_reg.html', {
@@ -316,6 +345,7 @@ class Register(LoginRequiredMixin, View):
         })
 
     def post(self, request, section_id):
+        from app.reg import RegistrationSetter
         rs = RegistrationSetter(request, section_id)
         for student in rs.pstudents:
             rs.set(student, 'reg-%s' % student.id in request.POST)

@@ -8,7 +8,7 @@
         <p><a href="{% url 'login' %}?next=sections">Log in</a> to see and change your children’s enrollments.</p>
     {% endif %}
     {% include "app/section_table.html" %}
-    {% if not include_all %}
+    {% if not include_past_sections %}
         <a class='btn btn-primary btn-sm' role="button" href='/app/sections?include=all'>Include Past Sections</a>
     {% endif %}
 {% endblock %}
