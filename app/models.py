@@ -157,7 +157,7 @@ class StudentSectionAssignment(models.Model):
     student     = models.ForeignKey(Student, on_delete=models.CASCADE)
     section     = models.ForeignKey(Section, on_delete=models.CASCADE)
     status      = models.IntegerField(choices=SS_STATUSES)
-    changed     = models.DateTimeField(null=True, blank=True)
+    applied_time= models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return '%s %s' % (self.student.name, str(self.section))
@@ -174,5 +174,5 @@ class AugmentedSsa:
 
 def augmented_student_section_assignments(section_id):
     'Return AugmentedSsa objects for a section'
-    ssas = StudentSectionAssignment.objects.filter(section_id=section_id).order_by('changed')
+    ssas = StudentSectionAssignment.objects.filter(section_id=section_id).order_by('applied_time')
     return [AugmentedSsa(ssa, seq >= ssa.section.max_students) for seq, ssa in enumerate(ssas)]

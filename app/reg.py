@@ -8,9 +8,9 @@ log = logging.getLogger(__name__)
 
 
 class StudentWithAssignment:
-    def __init__(self, student, assa):
+    def __init__(self, student, augmented_student_section_assignment):
         self.student = student
-        self.assa = assa  # May be None
+        self.assa = augmented_student_section_assignment  # May be None
 
 
 class RegistrationSetter:
@@ -28,7 +28,8 @@ class RegistrationSetter:
         current_assignment = StudentSectionAssignment.objects.filter(student=student, section=self.section)
 
         if turn_on and not current_assignment:
-            new_ssa = StudentSectionAssignment(student=student, section=self.section, status=1, changed=datetime.now())
+            new_ssa = StudentSectionAssignment(student=student, section=self.section,
+                    status=1, applied_time=datetime.now())
             new_ssa.save()
             msg = '%s applied for %s.' % (student.name, self.section)
             messages.add_message(self.request, messages.INFO, msg)

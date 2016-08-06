@@ -13,9 +13,9 @@
         <div class="well well-sm">
             <h4>{{ swa.student }}</h4>
             {% if swa.assa %}
-            <h5>{{ swa.assa.ssa.status_str }} at {{ swa.assa.ssa.changed }}</h5>
+            <h5>{{ swa.assa.ssa.status_str }}</h5>
                 {% if swa.assa.waitlisted %}
-                <h5>Waitlisted</h5>
+                <h5 class="text-warning">Waitlisted</h5>
                 {% endif %}
             {% endif %}
             {% buttons %}
