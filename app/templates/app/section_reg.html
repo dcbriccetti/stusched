@@ -12,16 +12,22 @@
         {% for swa in students_with_assignment %}
         <div class="well well-sm">
             <h4>{{ swa.student }}</h4>
-                <input id="reg-{{ swa.student.id }}" name="reg-{{ swa.student.id }}" type="checkbox"
-                {% if swa.assa %}
-                    checked
-                {% endif %}
-                /> <label for="reg-{{ swa.student.id }}">
+            {%  if swa.assa %}
+            <h5>{{ swa.assa.ssa.status_str }}</h5>
                 {% if swa.assa.waitlisted %}
-                    Waitlisted
-                {% else %}
-                    Enrolled
-                {% endif %}</label>
+                <h5>Waitlisted</h5>
+                {% endif %}
+            {% endif %}
+            <input id="reg-{{ swa.student.id }}" name="reg-{{ swa.student.id }}" type="checkbox"
+            {% if swa.assa %}
+                checked
+            {% endif %}
+            /> <label for="reg-{{ swa.student.id }}">
+            {% if swa.assa.waitlisted %}
+                Waitlisted
+            {% else %}
+                Enrolled
+            {% endif %}</label>
         </div>
         {% endfor %}
         {% buttons %}
