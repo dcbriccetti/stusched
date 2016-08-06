@@ -9,11 +9,8 @@
         <th>Hours / Day</th>
         <th># Days</th>
         <th title="Minumum, enrolled, and maximum number of students">Students</th>
-        {% if user.is_staff %}
+        {% if user.is_authenticated or user.is_staff %}
         <th>Names</th>
-        {% endif %}
-        {% if user.is_authenticated and not user.is_staff %}
-        <th>Your Students</th>
         {% endif %}
         <th>Notes</th>
     </tr>

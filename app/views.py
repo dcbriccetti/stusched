@@ -342,11 +342,15 @@ class Register(LoginRequiredMixin, View):
             'students_with_assignment': rs.swas,
         })
 
-    def post(self, request, section_id):
+    def post(self, request, section_id, student_id):
         from app.reg import RegistrationSetter
-        rs = RegistrationSetter(request, section_id)
-        for student in rs.children:
-            rs.set(student, 'reg-%s' % student.id in request.POST)
+        student = get_object_or_404(StudentModel, pk=student_id)
+        if parent_of_one_of_these_students(request.user, [student]):
+            apply    = 'apply'    in request.POST
+            unenroll = 'unenroll' in request.POST
+            if apply or unenroll:
+                rs = RegistrationSetter(request, section_id)
+                rs.set(student, apply)
 
         return redirect('/app/section/%s/register' % section_id)
 

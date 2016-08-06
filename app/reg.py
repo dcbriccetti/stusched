@@ -30,7 +30,7 @@ class RegistrationSetter:
         if turn_on and not current_assignment:
             new_ssa = StudentSectionAssignment(student=student, section=self.section, status=1, changed=datetime.now())
             new_ssa.save()
-            msg = '%s enrolled in %s.' % (student.name, self.section)
+            msg = '%s applied for %s.' % (student.name, self.section)
             messages.add_message(self.request, messages.INFO, msg)
             log.info('%s: %s', self.request.user, msg)
         elif current_assignment and not turn_on:

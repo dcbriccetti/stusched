@@ -7,31 +7,25 @@
     <h2>Register For {{ section.course.name }}</h2>
     <h4>{{ section.start_time }}</h4>
 
-    <form action="/app/section/{{ section.id }}/register" method="post">
+    {% for swa in students_with_assignment %}
+    <form action="/app/section/{{ section.id }}/register/{{ swa.student.id }}" method="post">
         {% csrf_token %}
-        {% for swa in students_with_assignment %}
         <div class="well well-sm">
             <h4>{{ swa.student }}</h4>
-            {%  if swa.assa %}
-            <h5>{{ swa.assa.ssa.status_str }}</h5>
+            {% if swa.assa %}
+            <h5>{{ swa.assa.ssa.status_str }} at {{ swa.assa.ssa.changed }}</h5>
                 {% if swa.assa.waitlisted %}
                 <h5>Waitlisted</h5>
                 {% endif %}
             {% endif %}
-            <input id="reg-{{ swa.student.id }}" name="reg-{{ swa.student.id }}" type="checkbox"
-            {% if swa.assa %}
-                checked
-            {% endif %}
-            /> <label for="reg-{{ swa.student.id }}">
-            {% if swa.assa.waitlisted %}
-                Waitlisted
-            {% else %}
-                Enrolled
-            {% endif %}</label>
+            {% buttons %}
+                {% if not swa.assa %}
+                <button name="apply" type="submit" class="btn btn-primary">Apply</button>
+                {% else %}
+                <button name="unenroll" type="submit" class="btn btn-primary">Unenroll</button>
+                {% endif %}
+            {% endbuttons %}
         </div>
-        {% endfor %}
-        {% buttons %}
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-        {% endbuttons %}
     </form>
+    {% endfor %}
 {% endblock %}
