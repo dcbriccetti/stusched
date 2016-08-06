@@ -6,6 +6,7 @@
 {% block content %}
 
     <h2>Edit Student</h2>
+    <p>Also: Please use the Courses page to set desired courses.</p>
     <form action="/app/student/{{ student_id }}?parent_id={{ parent_id }}" method="post">
         {% csrf_token %}
         {% bootstrap_form form %}

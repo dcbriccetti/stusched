@@ -113,7 +113,7 @@ class ParentForm(ModelForm):
 class StudentForm(ModelForm):
     class Meta:
         model = Student
-        fields = ('name', 'birthdate', 'grade_from_age', 'school', 'email', 'wants_courses', 'when_available', 'notes')
+        fields = ('name', 'birthdate', 'grade_from_age', 'school', 'email', 'when_available', 'notes')
 
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)
