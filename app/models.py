@@ -162,6 +162,9 @@ class StudentSectionAssignment(models.Model):
     def __str__(self):
         return '%s %s' % (self.student.name, str(self.section))
 
+    def status_str(self):
+        return SS_STATUSES_BY_ID[self.status]
+
 
 class AugmentedSsa:
     'Provide a StudentSectionAssignment along with whether the student is waitlisted'
@@ -169,7 +172,7 @@ class AugmentedSsa:
         self.ssa = ssa
         self.waitlisted = waitlisted
 
-def augmented_student_section_assignments(section):
+def augmented_student_section_assignments(section_id):
     'Return AugmentedSsa objects for a section'
-    ssas = StudentSectionAssignment.objects.filter(section_id=section.id).order_by('changed')
+    ssas = StudentSectionAssignment.objects.filter(section_id=section_id).order_by('changed')
     return [AugmentedSsa(ssa, seq >= ssa.section.max_students) for seq, ssa in enumerate(ssas)]

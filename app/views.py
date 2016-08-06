@@ -109,7 +109,7 @@ def make_section_rows(user, sections):
             self.viewable = viewable
 
             def status_group_names():
-                aug_ssas = augmented_student_section_assignments(section)
+                aug_ssas = augmented_student_section_assignments(section.id)
                 def status_from_assa(assa): return assa.ssa.status
                 aug_ssas.sort(key=status_from_assa)
                 num_statuses = len(set((assa.ssa.status for assa in aug_ssas)))
@@ -338,16 +338,14 @@ class Register(LoginRequiredMixin, View):
         rs = RegistrationSetter(request, section_id)
 
         return render(request, 'app/section_reg.html', {
-            'section':          rs.section,
-            'students':         rs.pstudents,
-            'reg_ids':          rs.registered_children_ids,
-            'waitlisted_ids':   rs.waitlisted_children_ids,
+            'section':                  rs.section,
+            'students_with_assignment': rs.swas,
         })
 
     def post(self, request, section_id):
         from app.reg import RegistrationSetter
         rs = RegistrationSetter(request, section_id)
-        for student in rs.pstudents:
+        for student in rs.children:
             rs.set(student, 'reg-%s' % student.id in request.POST)
 
         return redirect('/app/section/%s/register' % section_id)

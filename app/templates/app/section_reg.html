@@ -9,15 +9,15 @@
 
     <form action="/app/section/{{ section.id }}/register" method="post">
         {% csrf_token %}
-        {% for student in students %}
+        {% for swa in students_with_assignment %}
         <div class="well well-sm">
-            <h4>{{ student }}</h4>
-                <input id="reg-{{ student.id }}" name="reg-{{ student.id }}" type="checkbox"
-                {% if student.id in reg_ids %}
+            <h4>{{ swa.student }}</h4>
+                <input id="reg-{{ swa.student.id }}" name="reg-{{ swa.student.id }}" type="checkbox"
+                {% if swa.assa %}
                     checked
                 {% endif %}
-                /> <label for="reg-{{ student.id }}">
-                {% if student.id in waitlisted_ids %}
+                /> <label for="reg-{{ swa.student.id }}">
+                {% if swa.assa.waitlisted %}
                     Waitlisted
                 {% else %}
                     Enrolled
