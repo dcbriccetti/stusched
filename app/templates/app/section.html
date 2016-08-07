@@ -6,7 +6,7 @@
     <h2>{{ section.course.name }}</h2>
     <h4>{{ section.start_time }}</h4>
 
-    {% if ok_to_show %}
+    {% if ok_to_show_students %}
     <a class='btn btn-primary btn-sm' role="button" href='/app/section/{{ section.id }}/calendar'>Add to Calendar</a>
     <h3>Students</h3>
     <table class="table">
@@ -25,7 +25,13 @@
     {% for s in students %}
         <tr>
         <td>{{ s.name }}</td>
-        <td>{{ s.age }}</td>
+        <td>
+        {% if user.is_staff %}
+        {{ s.age }}
+        {% else %}
+        {{ s.age_conventional }}
+        {% endif %}
+        </td>
         <td>{{ s.grade }}</td>
         <td>{{ s.parent.name }}</td>
         {% if user.is_staff %}

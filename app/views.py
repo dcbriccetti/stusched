@@ -12,7 +12,8 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.views.generic import View
 from app.students import students_of_parent
-from .models import Course, Section, Parent, SS_STATUSES_BY_ID, SS_STATUS_ACCEPTED, augmented_student_section_assignments
+from .models import Course, Section, Parent, SS_STATUSES_BY_ID, SS_STATUS_ACCEPTED, augmented_student_section_assignments, \
+    StudentSectionAssignment
 from .models import Student as StudentModel
 from .forms import AuthenticationForm, NewUserForm, StudentForm, ParentForm
 
@@ -85,8 +86,7 @@ def students(request):
 
 
 def parent_of_one_of_these_students(user, students):
-    stus = students_of_parent(user)
-    return bool(set(stus) & set(students))
+    return bool(set(students_of_parent(user)) & set(students))
 
 
 def get_student_wants(user):
@@ -144,9 +144,11 @@ def sections(request):
 def get_viewable_section_ids(user):
     viewable_section_ids = set()
     if user and not user.is_staff:
-        for stu in students_of_parent(user):
-            for section in stu.sections.all():
-                viewable_section_ids.add(section.id)
+        for student in students_of_parent(user):
+            for section in student.sections.all():
+                if StudentSectionAssignment.objects.filter(student=student, section=section,
+                        status=SS_STATUS_ACCEPTED).count():
+                    viewable_section_ids.add(section.id)
     return viewable_section_ids
 
 
@@ -168,10 +170,15 @@ def _these_students_in_other_sections(section_id, students):
 def section(request, section_id):
     section = Section.objects.get(id=int(section_id))
     students_in_this_section = section.student_set.all().order_by('name')
+    accepted_students_ids = set((ssa.student_id for ssa in StudentSectionAssignment.objects.
+        filter(section_id=section_id, status=SS_STATUS_ACCEPTED)))
+    accepted_students_in_this_section = [
+        student for student in students_in_this_section if student.id in accepted_students_ids]
 
-    ok_to_show = request.user.is_staff or parent_of_one_of_these_students(request.user, students_in_this_section)
+    ok_to_show_students = request.user.is_staff or \
+        parent_of_one_of_these_students(request.user, accepted_students_in_this_section)
 
-    these_students_in_other_sections = _these_students_in_other_sections(section.id, students_in_this_section)
+    these_students_in_other_sections = _these_students_in_other_sections(section.id, accepted_students_in_this_section)
 
     class StudentsInSection:
         def __init__(self, section, student_names):
@@ -182,9 +189,12 @@ def section(request, section_id):
         for section, student_names in these_students_in_other_sections.items() if len(student_names) > 1]
     students_in_sections.sort(key=lambda ss: ss.section.start_time)
 
-    return render(request, 'app/section.html',
-        {'section': section, 'students': students_in_this_section, 'overlaps': students_in_sections,
-         'ok_to_show': ok_to_show})
+    return render(request, 'app/section.html', {
+        'section':  section,
+        'students': students_in_this_section,
+        'overlaps': students_in_sections,
+        'ok_to_show_students': ok_to_show_students
+    })
 
 
 class Login(View):

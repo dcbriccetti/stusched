@@ -100,6 +100,10 @@ class Student(models.Model):
         years = self.age_years()
         return "%.2f" % years if years else ''
 
+    def age_conventional(self):
+        years = self.age_years()
+        return "%d" % years if years else ''
+
     def age_years(self):
         today = date.today()
         return (today - self.birthdate).days / DAYS_PER_YEAR if self.birthdate else None
