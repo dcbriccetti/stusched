@@ -42,8 +42,8 @@ class AdminEmail(View):
             })
             text_content = html2text.html2text(html_content)
 
-            msg = EmailMultiAlternatives('Upcoming classes', text_content,
-                'Dave B’s Student Information System <daveb@davebsoft.com>', [parent.name + ' <daveb@davebsoft.com>'])
+            msg = EmailMultiAlternatives('Status of Dave B’s Young Programmers', text_content,
+                'Dave B’s Student Information System <daveb@davebsoft.com>', ['%s <%s>' % (parent.name, parent.email)])
             msg.attach_alternative(html_content, "text/html")
             msgs.append(msg)
 
