@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<p>Hello, {{ parent.name }}. Here’s the status of things with Dave B’s Young Programmers.</p>
+{% with num_stu=parent.student_set.count %}
+    {% if num_stu %}
+<p>You have {{ num_stu }} young programmer{{ num_stu|pluralize }} in the student information system:</p>
+<ul>
+    {% for student in parent.student_set.all %}
+    <li>{{ student.name }}</li>
+    {% endfor %}
+</ul>
+    {% else %}
+    <p>You have no young programmers in the student information system.</p>
+    {% endif %}
+{% endwith %}
+
+<h2>Upcoming Course Sections</h2>
+<table>
+    <tr>
+        <th>Title</th>
+        <th>Time</th>
+        <th>Status</th>
+        <th>Price</th>
+    </tr>
+    {% for section in sections %}
+    <tr>
+        <td>{{ section.course }}</td>
+        <td>{{ section.start_time }}</td>
+        <td>{{ section.scheduled_status_string }}</td>
+        <td>
+            {% if section.price %}
+            ${{ section.price }}
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h2>Dave B’s Student Information System</h2>
+{% if signup_url %}
+    You can <a href="{{ signup_url }}">create an account</a>, linking it to information you have already
+    provided.
+{% else %}
+    <a href="{{ dbsis_url }}">Go to Dave B’s Student Information System</a>
+{% endif %}
+
+<p>To turn off these emails, please email <a href="mailto:daveb@davebsoft.com">Dave Briccetti</a>.</p>
+
+</body>
+</html>

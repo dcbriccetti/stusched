@@ -1,9 +1,13 @@
+from datetime import datetime
+from urllib.parse import urlencode
+from django.core import mail
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
 from django.template.loader import get_template
 from django.views.generic import View
 from django.core.mail import EmailMultiAlternatives
 import html2text
+from app.models import Parent, Section
 
 
 class Admin(View):
@@ -13,16 +17,37 @@ class Admin(View):
 
 class AdminEmail(View):
     def get(self, request):
-        class ESection:
-            def __init__(self, time, title):
-                self.time = time
-                self.title = title
+        status_template = get_template('app/email/status.html')
+        parents = Parent.objects.exclude(email__isnull=True).exclude(email__exact='')
+        sections = Section.objects.filter(start_time__gt=datetime.now()).order_by('start_time')
+        dbsis_url = 'https://dbsis.herokuapp.com'
 
-        t = get_template('app/email/upcoming.html')
-        html_content = t.render({'sections': (ESection('Monday', '3D Animation with Processing'),)})
-        text_content = html2text.html2text(html_content)
-        msg = EmailMultiAlternatives('Upcoming classes', text_content,
-            'Dave B’s Student Information System <daveb@davebsoft.com>', ['daveb@davebsoft.com'])
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
+        connection = mail.get_connection()
+        connection.open()
+        msgs = []
+
+        for parent in parents:
+            users = parent.users.all()
+            signup_url = dbsis_url + '/app/login?' + urlencode({
+                'name':         parent.name,
+                'email':        parent.email,
+                'parent_code':  parent.code
+            }) if parent.code and not users else None
+
+            html_content = status_template.render({
+                'parent':       parent,
+                'dbsis_url':    dbsis_url,
+                'signup_url':   signup_url,
+                'sections':     sections,
+            })
+            text_content = html2text.html2text(html_content)
+
+            msg = EmailMultiAlternatives('Upcoming classes', text_content,
+                'Dave B’s Student Information System <daveb@davebsoft.com>', [parent.name + ' <daveb@davebsoft.com>'])
+            msg.attach_alternative(html_content, "text/html")
+            msgs.append(msg)
+
+        connection.send_messages(msgs)
+        connection.close()
+
         return redirect(reverse('admin'))
