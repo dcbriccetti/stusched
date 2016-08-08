@@ -25,6 +25,9 @@
 
     <ul class="nav nav-tabs">
         <li role="presentation" class={% active_nav request 'index'     %}><a href="{% url 'index'     %}">Home</a></li>
+        {% if user.is_staff %}
+        <li role="presentation" class={% active_nav request 'admin'     %}><a href="{% url 'admin'     %}">Admin</a></li>
+        {% endif %}
         <li role="presentation" class={% active_nav request 'parent'    %}><a href="{% url 'parent'    %}">Parent</a></li>
         <li role="presentation" class={% active_nav request 'students'  %}><a href="{% url 'students'  %}">Students</a></li>
         <li role="presentation" class={% active_nav request 'courses'   %}><a href="{% url 'courses'   %}">Courses</a></li>

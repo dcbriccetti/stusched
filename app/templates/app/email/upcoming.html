@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<h1>Dave B’s Young Programmers Upcoming Course Sections</h1>
+<table>
+    <tr>
+        <th>Time</th>
+        <th>Title</th>
+    </tr>
+    {% for section in sections %}
+    <tr>
+        <td>{{ section.time }}</td>
+        <td>{{ section.title }}</td>
+    </tr>
+    {% endfor %}
+</table>
+</body>
+</html>

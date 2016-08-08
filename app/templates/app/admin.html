@@ -1,0 +1,11 @@
+{% extends "app/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}{{ block.super }}{% endblock %}
+
+{% block content %}
+    {% if user.is_staff %}
+        <p></p>
+        <a class="btn btn-primary" role="button" href="/app/admin/email">Email</a>
+    {% endif %}
+{% endblock %}
