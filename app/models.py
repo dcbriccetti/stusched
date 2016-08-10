@@ -2,7 +2,7 @@ import re
 from datetime import date, datetime, timedelta
 from django.db import models
 from django.contrib.auth.models import User
-from app.sections import section_rows
+from app.sections import SectionRows
 
 DAYS_PER_YEAR = 365.24
 
@@ -140,7 +140,7 @@ class Student(models.Model):
 
     @property
     def section_rows(self):
-        return section_rows(self.sections.all())
+        return SectionRows(self.sections.all(), None)
 
     def __str__(self):
         return self.name.__str__()

@@ -19,27 +19,10 @@
     {% endif %}
 {% endwith %}
 
-<h2>Upcoming Course Sections</h2>
-<table>
-    <tr>
-        <th>Title</th>
-        <th>When</th>
-        <th>Status</th>
-        <th>Price</th>
-    </tr>
-    {% for section in sections %}
-    <tr>
-        <td>{{ section.course }}</td>
-        <td>{{ section.when }}</td>
-        <td>{{ section.scheduled_status_string }}</td>
-        <td>
-            {% if section.price %}
-            ${{ section.price }}
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+{% if section_rows.future %}
+    <h2>Upcoming Course Sections</h2>
+    {% include "app/section_table.html" with section_rows=section_rows.future %}
+{% endif %}
 
 <h2>Dave B’s Student Information System</h2>
 {% if signup_url %}

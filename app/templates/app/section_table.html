@@ -9,7 +9,7 @@
     {% endif %}
         <th>Price</th>
         <th title="Minumum, enrolled, and maximum number of students">Students</th>
-        {% if user.is_authenticated or user.is_staff %}
+        {% if show_students %}
         <th>Names</th>
         {% endif %}
         <th>Notes</th>
@@ -57,7 +57,7 @@
                 </span>
                 <span class='text-muted' style="font-size: 70%"> ≤ {{ row.section.max_students }}</span>
             </td>
-            {% if user.is_authenticated or user.is_staff %}
+            {% if show_students %}
             <td>{{ row.students }}</td>
             {% endif %}
             <td>{{ row.section.notes }}</td>

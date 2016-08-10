@@ -1,5 +1,5 @@
 import logging
-from app.sections import section_rows, get_viewable_section_ids
+from app.sections import SectionRows, get_viewable_section_ids
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.db.models import Count
@@ -80,6 +80,7 @@ def students(request):
     return render(request, 'app/students.html', {
         'parents': parents,
         'get_viewable_section_ids': get_viewable_section_ids(request.user),
+        'show_students':            request.user.is_authenticated or request.user.is_staff
     })
 
 
@@ -100,8 +101,9 @@ def get_student_wants(user):
 
 def sections(request):
     return render(request, 'app/sections.html', {
-        'section_rows':             section_rows(Section.objects.all(), request.user),
+        'section_rows':             SectionRows(Section.objects.all(), request.user),
         'include_past_sections':    request.GET.get('include', 'future') == 'all',
+        'show_students':            request.user.is_authenticated or request.user.is_staff
     })
 
 

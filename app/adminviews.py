@@ -1,5 +1,5 @@
-from datetime import datetime
 from urllib.parse import urlencode
+from app.sections import SectionRows
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
@@ -19,26 +19,28 @@ class AdminEmail(View):
     def get(self, request):
         status_template = get_template('app/email/status.html')
         parents = Parent.objects.exclude(email__isnull=True).exclude(email__exact='')
-        sections = Section.objects.filter(start_time__gt=datetime.now()).order_by('start_time')
         dbsis_url = 'https://dbsis.herokuapp.com'
 
         connection = mail.get_connection()
         connection.open()
         msgs = []
+        sections = Section.objects.all()
 
         for parent in parents:
-            users = parent.users.all()
+            user = parent.users.first()
             signup_url = dbsis_url + '/app/login?' + urlencode({
                 'name':         parent.name,
                 'email':        parent.email,
                 'parent_code':  parent.code
-            }) if parent.code and not users else None
+            }) if parent.code and not user else None
 
+            rows = SectionRows(sections, user)
             html_content = status_template.render({
                 'parent':       parent,
                 'dbsis_url':    dbsis_url,
                 'signup_url':   signup_url,
-                'sections':     sections,
+                'section_rows': rows,
+                'show_students': True,
             })
             text_content = html2text.html2text(html_content)
 
