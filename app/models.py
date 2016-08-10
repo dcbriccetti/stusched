@@ -2,6 +2,7 @@ import re
 from datetime import date, datetime, timedelta
 from django.db import models
 from django.contrib.auth.models import User
+from app.sections import section_rows
 
 DAYS_PER_YEAR = 365.24
 
@@ -55,7 +56,7 @@ class Section(models.Model):
         return hpd[:-3] if hpd.endswith('.00') else hpd
 
     def when(self):
-        date_part = self.start_time.strftime('%a, %b %d, %y')
+        date_part = self.start_time.strftime('%a, %b %d, ’%y')
         if (self.num_days > 1):
             date_part2 = (self.start_time + timedelta(days=int(self.num_days))).strftime('%b %d')
             date_part += '–' + date_part2
@@ -138,9 +139,8 @@ class Student(models.Model):
         return ', '.join([course.name for course in self.wants_courses.all().order_by('name')])
 
     @property
-    def section_rows_by_time(self):
-        from app.views import make_section_rows  # Avoid a cyclical dependency
-        return make_section_rows(None, self.sections.all().order_by('start_time'))
+    def section_rows(self):
+        return section_rows(self.sections.all())
 
     def __str__(self):
         return self.name.__str__()

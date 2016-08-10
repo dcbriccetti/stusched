@@ -23,14 +23,14 @@
 <table>
     <tr>
         <th>Title</th>
-        <th>Time</th>
+        <th>When</th>
         <th>Status</th>
         <th>Price</th>
     </tr>
     {% for section in sections %}
     <tr>
         <td>{{ section.course }}</td>
-        <td>{{ section.start_time }}</td>
+        <td>{{ section.when }}</td>
         <td>{{ section.scheduled_status_string }}</td>
         <td>
             {% if section.price %}

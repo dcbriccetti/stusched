@@ -1,6 +1,5 @@
-from datetime import datetime, timedelta
 import logging
-from itertools import groupby
+from app.sections import section_rows, get_viewable_section_ids
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.db.models import Count
@@ -12,8 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.views.generic import View
 from app.students import students_of_parent
-from .models import Course, Section, Parent, SS_STATUSES_BY_ID, SS_STATUS_ACCEPTED, augmented_student_section_assignments, \
-    StudentSectionAssignment
+from .models import Course, Section, Parent, SS_STATUS_ACCEPTED, StudentSectionAssignment
 from .models import Student as StudentModel
 from .forms import AuthenticationForm, NewUserForm, StudentForm, ParentForm
 
@@ -100,58 +98,11 @@ def get_student_wants(user):
             for student in students]
 
 
-def make_section_rows(user, sections):
-    sop = students_of_parent(user) if user else []
-
-    class SectionRow:
-        def __init__(self, section, viewable):
-            self.section = section
-            self.viewable = viewable
-
-            def status_group_names():
-                aug_ssas = augmented_student_section_assignments(section.id)
-                def status_from_assa(assa): return assa.ssa.status
-                aug_ssas.sort(key=status_from_assa)
-                num_statuses = len(set((assa.ssa.status for assa in aug_ssas)))
-
-                for status_id, grouped_assas in groupby(aug_ssas, status_from_assa):
-                    def fmt_name(assa):
-                        return assa.ssa.student.name + (' (waitlist)' if assa.waitlisted else '')
-                    names = [fmt_name(assa) for assa in grouped_assas if not user or user.is_staff or assa.ssa.student in sop]
-                    if names:
-                        names.sort()
-                        status_heading = '%s: ' % SS_STATUSES_BY_ID[status_id] if \
-                            num_statuses > 1 or status_id != SS_STATUS_ACCEPTED else ''
-                        yield '%s%s' % (status_heading, ', '.join(names))
-
-            self.students = ', '.join(status_group_names())
-
-    viewable_section_ids = get_viewable_section_ids(user)
-    return [SectionRow(section, section.id in viewable_section_ids) for section in sections]
-
-
 def sections(request):
-    include_past_sections = request.GET.get('include', 'future') == 'all'
-    sections = Section.objects.all().order_by('-start_time')
-    def is_future(s): return s.start_time + timedelta(days=s.num_days) > datetime.now()
-    future_sections = sorted(filter(is_future, sections), key=lambda s: s.start_time)
-    past_sections   = filter(lambda s: not is_future(s), sections) if include_past_sections else []
     return render(request, 'app/sections.html', {
-        'future_section_rows':      make_section_rows(request.user, future_sections),
-        'past_section_rows':        make_section_rows(request.user, past_sections),
-        'include_past_sections':    include_past_sections,
+        'section_rows':             section_rows(Section.objects.all(), request.user),
+        'include_past_sections':    request.GET.get('include', 'future') == 'all',
     })
-
-
-def get_viewable_section_ids(user):
-    viewable_section_ids = set()
-    if user and not user.is_staff:
-        for student in students_of_parent(user):
-            for section in student.sections.all():
-                if StudentSectionAssignment.objects.filter(student=student, section=section,
-                        status=SS_STATUS_ACCEPTED).count():
-                    viewable_section_ids.add(section.id)
-    return viewable_section_ids
 
 
 def _these_students_in_other_sections(section_id, students):

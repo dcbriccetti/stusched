@@ -28,10 +28,19 @@
                 <dt>When available</dt><dd>{{ student.when_available }}</dd>
                 <dt>Notes</dt><dd>{{ student.notes }}</dd>
             </dl>
-            {% if student.sections.count %}
+        {% with student.section_rows as section_rows %}
+            {% if section_rows.future or section_rows.past %}
             <h4>Enrollments</h4>
-            {% include "app/section_table.html" with section_rows=student.section_rows_by_time %}
+                {% if section_rows.future %}
+            <h5>Upcoming</h5>
+                {% include "app/section_table.html" with section_rows=section_rows.future %}
+                {% endif %}
+                {% if section_rows.past %}
+            <h5>Past</h5>
+                {% include "app/section_table.html" with section_rows=section_rows.past %}
+                {% endif %}
             {% endif %}
+        {% endwith %}
         </div>
     {% endfor %}
     <a class='btn btn-primary btn-sm' role="button" href='{% url 'student' 0%}?parent_id={{ parent.id }}'>Add a student</a>

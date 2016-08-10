@@ -2,10 +2,12 @@
     <thead>
     <tr>
         <th></th>
-        <th>Course</th>
-        <th>Status</th>
-        <th>Price</th>
         <th>When</th>
+        <th>Course</th>
+    {% if show_status %}
+        <th>Status</th>
+    {% endif %}
+        <th>Price</th>
         <th title="Minumum, enrolled, and maximum number of students">Students</th>
         {% if user.is_authenticated or user.is_staff %}
         <th>Names</th>
@@ -26,6 +28,7 @@
                        class='btn btn-primary btn-xs' role="button" href='/app/section/{{ row.section.id }}/register'>Reg</a>
                 {% endif %}
             </td>
+            <td>{{ row.section.when }}</td>
             <td>
                 {% if row.section.course.url %}
                     <a href={{ row.section.course.url }}>{{ row.section.course.name }}</a>
@@ -33,13 +36,14 @@
                     {{ row.section.course.name }}
                 {% endif %}
             </td>
+        {% if show_status %}
             <td>{{ row.section.scheduled_status_string }}</td>
+        {% endif %}
             <td>
                 {% if row.section.price %}
                 ${{ row.section.price }}
                 {% endif %}
             </td>
-            <td>{{ row.section.when }}</td>
             <td>
                 <span class='text-muted' style="font-size: 70%">{{ row.section.min_students }} ≤ </span>
                 <span
