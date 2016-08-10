@@ -171,7 +171,7 @@ def _these_students_in_other_sections(section_id, students):
 @login_required
 def section(request, section_id):
     section = Section.objects.get(id=int(section_id))
-    students_in_this_section = section.student_set.all().order_by('name')
+    students_in_this_section = section.students_sorted()
     accepted_students_ids = set((ssa.student_id for ssa in StudentSectionAssignment.objects.
         filter(section_id=section_id, status=SS_STATUS_ACCEPTED)))
     accepted_students_in_this_section = [
@@ -289,13 +289,12 @@ class ParentView(LoginRequiredMixin, View):
 
 
 class Student(LoginRequiredMixin, View):
-    def get(self, request, id_str):
-        if id_str == '0':
+    def get(self, request, student_id):
+        if student_id == '0':
             parent = get_object_or_404(Parent, pk=request.GET['parent_id'])
             form = StudentForm()
             student_id = 0
         else:
-            student_id = int(id_str)
             student = get_object_or_404(StudentModel, pk=student_id)
             form = StudentForm(instance=student)
             parent = student.parent
@@ -309,13 +308,11 @@ class Student(LoginRequiredMixin, View):
         else:
             raise Http404('That is not a student you can edit')
 
-    def post(self, request, id_str):
-        if id_str == '0':
+    def post(self, request, student_id):
+        if student_id == '0':
             parent = Parent.objects.filter(id=request.GET['parent_id']).first()
             student = None
-            student_id = 0
         else:
-            student_id = int(id_str)
             student = StudentModel.objects.filter(id=student_id).first()
             parent = student.parent
         if self._student_ok(parent, request.user):

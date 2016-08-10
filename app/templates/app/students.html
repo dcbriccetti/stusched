@@ -13,10 +13,10 @@
     <hr style="border: medium black solid">
     <h2>{{ parent.name }}</h2>
     {% endif %}
-    {% for student in parent.student_set.all %}
+    {% for student in parent.students_sorted %}
         <div class="well">
             <h3 style="margin-top: 0">
-                <a href='/app/student/{{ student.id }}'><span title="Edit student profile" class="glyphicon glyphicon-edit"></span></a>
+                <a href='{% url 'student' student.id %}'><span title="Edit student profile" class="glyphicon glyphicon-edit"></span></a>
                 {{ student.name }}
             </h3>
             <dl class="dl-horizontal">
@@ -34,6 +34,6 @@
             {% endif %}
         </div>
     {% endfor %}
-    <a class='btn btn-primary btn-sm' role="button" href='/app/student/0?parent_id={{ parent.id }}'>Add a student</a>
+    <a class='btn btn-primary btn-sm' role="button" href='{% url 'student' 0%}?parent_id={{ parent.id }}'>Add a student</a>
 {% endfor %}
 {% endblock %}

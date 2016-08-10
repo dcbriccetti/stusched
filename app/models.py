@@ -46,7 +46,7 @@ class Section(models.Model):
     def students(self):
         return ', '.join((s.name for s in self.student_set.all().order_by('name')))
 
-    def student_objects(self):
+    def students_sorted(self):
         return self.student_set.all().order_by('name')
 
     def hours_per_day_formatted(self):
@@ -76,6 +76,9 @@ class Parent(models.Model):
 
     def active(self):
         return self.student_set.filter(active=True).count() > 0
+
+    def students_sorted(self):
+        return self.student_set.all().order_by('name')
 
     active.boolean = True
 
