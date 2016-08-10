@@ -132,11 +132,13 @@ def make_section_rows(user, sections):
 
 def sections(request):
     include_past_sections = request.GET.get('include', 'future') == 'all'
-    sections = list(Section.objects.all().order_by('-start_time'))
-    if not include_past_sections:
-        sections = [s for s in sections if not s.start_time + timedelta(days=s.num_days) < datetime.now()]
+    sections = Section.objects.all().order_by('-start_time')
+    def is_future(s): return s.start_time + timedelta(days=s.num_days) > datetime.now()
+    future_sections = sorted(filter(is_future, sections), key=lambda s: s.start_time)
+    past_sections   = filter(lambda s: not is_future(s), sections) if include_past_sections else []
     return render(request, 'app/sections.html', {
-        'section_rows':             make_section_rows(request.user, sections),
+        'future_section_rows':      make_section_rows(request.user, future_sections),
+        'past_section_rows':        make_section_rows(request.user, past_sections),
         'include_past_sections':    include_past_sections,
     })
 

@@ -7,8 +7,12 @@
     {% if not user.is_authenticated %}
         <p><a href="{% url 'login' %}?next=sections">Log in</a> to see and change your children’s enrollments.</p>
     {% endif %}
-    {% include "app/section_table.html" %}
-    {% if not include_past_sections %}
-        <a class='btn btn-primary btn-sm' role="button" href='/app/sections?include=all'>Include Past Sections</a>
+    <h3>Upcoming</h3>
+    {% include "app/section_table.html" with section_rows=future_section_rows %}
+    {% if include_past_sections %}
+    <h3>Past</h3>
+    {% include "app/section_table.html" with section_rows=past_section_rows %}
+    {% else %}
+        <a class='btn btn-primary btn-sm' role="button" href='{% url 'sections' %}?include=all'>Include Past Sections</a>
     {% endif %}
 {% endblock %}
