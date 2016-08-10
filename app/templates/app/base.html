@@ -13,9 +13,6 @@
            width: auto !important;
         }
     </style>
-    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
@@ -28,7 +25,9 @@
         {% if user.is_staff %}
         <li role="presentation" class={% active_nav request 'admin'     %}><a href="{% url 'admin'     %}">Admin</a></li>
         {% endif %}
+        {% if not user.is_staff %}
         <li role="presentation" class={% active_nav request 'parent'    %}><a href="{% url 'parent'    %}">Parent</a></li>
+        {% endif %}
         <li role="presentation" class={% active_nav request 'students'  %}><a href="{% url 'students'  %}">Students</a></li>
         <li role="presentation" class={% active_nav request 'courses'   %}><a href="{% url 'courses'   %}">Courses</a></li>
         <li role="presentation" class={% active_nav request 'sections'  %}><a href="{% url 'sections'  %}">Sections</a></li>
