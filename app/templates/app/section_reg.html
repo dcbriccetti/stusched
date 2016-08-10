@@ -4,10 +4,10 @@
 {% block title %}{{ block.super }} - Section Registrations{% endblock %}
 
 {% block content %}
-    <h2>Register For {{ section.course.name }}</h2>
-    <h4>{{ section.start_time }}</h4>
+    <h2>Register for Course Section</h2>
+    {% include "app/section_head.html" %}
 
-    <div class="row">
+    <div class="row" style="margin-top: 2em">
         {% for swa in students_with_assignment %}
         <div class="col-md-2">
         <form action="/app/section/{{ section.id }}/register/{{ swa.student.id }}" method="post">

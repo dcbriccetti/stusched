@@ -3,17 +3,9 @@
 {% block title %}{{ block.super }} - Section{% endblock %}
 
 {% block content %}
-    <h2>{{ section.course.name }} {% if section.scheduled_status_string %}({{ section.scheduled_status_string }}){% endif %}</h2>
-    <h4>{{ section.start_time }}, {{ section.hours_per_day_formatted }} hours per day,
-        {{ section.num_days }} day{{ section.num_days | pluralize }}{% if section.price %}, ${{ section.price }} {% endif %}
-    </h4>
-    {% if section.notes %}
-    <h4>Notes</h4>
-    <p>{{ section.notes }}</p>
-    {% endif %}
+    {% include "app/section_head.html" %}
 
     {% if ok_to_show_students %}
-    <a class='btn btn-primary btn-sm' role="button" href='/app/section/{{ section.id }}/calendar'>Add to Calendar</a>
     <h3>Students</h3>
     <table class="table">
     <thead>

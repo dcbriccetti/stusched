@@ -5,9 +5,7 @@
         <th>Course</th>
         <th>Status</th>
         <th>Price</th>
-        <th>Start Time</th>
-        <th>Hours / Day</th>
-        <th># Days</th>
+        <th>When</th>
         <th title="Minumum, enrolled, and maximum number of students">Students</th>
         {% if user.is_authenticated or user.is_staff %}
         <th>Names</th>
@@ -41,9 +39,7 @@
                 ${{ row.section.price }}
                 {% endif %}
             </td>
-            <td>{{ row.section.start_time }}</td>
-            <td>{{ row.section.hours_per_day_formatted }}</td>
-            <td>{{ row.section.num_days }}</td>
+            <td>{{ row.section.when }}</td>
             <td>
                 <span class='text-muted' style="font-size: 70%">{{ row.section.min_students }} ≤ </span>
                 <span

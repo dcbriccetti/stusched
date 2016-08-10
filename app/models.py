@@ -1,3 +1,4 @@
+import re
 from datetime import date, datetime, timedelta
 from django.db import models
 from django.contrib.auth.models import User
@@ -53,9 +54,19 @@ class Section(models.Model):
         hpd = str(self.hours_per_day)
         return hpd[:-3] if hpd.endswith('.00') else hpd
 
-    def end_time(self):
-        t = self.start_time + timedelta(minutes=int(self.hours_per_day * 60))
-        return t
+    def when(self):
+        date_part = self.start_time.strftime('%a, %b %d, %y')
+        if (self.num_days > 1):
+            date_part2 = (self.start_time + timedelta(days=int(self.num_days))).strftime('%b %d')
+            date_part += '–' + date_part2
+        def time_fmt(minute): return '%I %p' if minute == 0 else '%I:%M %p'
+        end_time = self.start_time + timedelta(minutes=int(self.hours_per_day * 60))
+        result = '%s, %s–%s' % (date_part, self.start_time.strftime(time_fmt(self.start_time.minute)),
+            end_time.strftime(time_fmt(end_time.minute)))
+        result = re.compile('0+(\d)').sub('\g<1>', result)  # Remove leading zeroes
+        for ap in ('AM', 'PM'):
+            result = re.compile('(.*)( {0})(.*)( {0})'.format(ap)).sub('\g<1>\g<3>\g<4>', result)  # Remove redundant AM/PM
+        return result
 
 
 class Parent(models.Model):
