@@ -34,7 +34,7 @@ class StudentAdmin(admin.ModelAdmin):
 class SectionAdmin(admin.ModelAdmin):
     list_display = ('course', 'start_time', 'num_students', 'students', 'hours_per_day',
                     'num_days', 'price', 'notes', 'private_notes')
-    ordering = ('start_time',)
+    ordering = ('-start_time',)
     search_fields = ('course__name',)
     inlines = [StudentsInSectionInline]
 
