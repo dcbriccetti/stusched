@@ -1,4 +1,5 @@
 {% extends "app/base.html" %}
+{% load sections %}
 
 {% block title %}{{ block.super }} - Status{% endblock %}
 
@@ -28,7 +29,7 @@
                 <dt>When available</dt><dd>{{ student.when_available }}</dd>
                 <dt>Notes</dt><dd>{{ student.notes }}</dd>
             </dl>
-        {% with student.section_rows as section_rows %}
+        {% with student|rows:user as section_rows %}
             {% if section_rows.future or section_rows.past %}
             <h4>Enrollments</h4>
                 {% if section_rows.future %}

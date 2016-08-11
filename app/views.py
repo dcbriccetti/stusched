@@ -73,14 +73,15 @@ class Courses(View):
 def students(request):
     user = request.user
     if user.is_staff:
-        parents = [p for p in Parent.objects.order_by('name') if p.active()]
+        parents = [p for p in Parent.objects.order_by('name').prefetch_related('student_set') if p.active()]
     else:
         parents = Parent.objects.filter(users=user)
 
     return render(request, 'app/students.html', {
-        'parents': parents,
+        'parents':                  parents,
         'get_viewable_section_ids': get_viewable_section_ids(request.user),
-        'show_students':            request.user.is_authenticated or request.user.is_staff
+        'show_students':            request.user.is_authenticated or request.user.is_staff,
+        'show_internal_links':      True,
     })
 
 
@@ -101,9 +102,10 @@ def get_student_wants(user):
 
 def sections(request):
     return render(request, 'app/sections.html', {
-        'section_rows':             SectionRows(Section.objects.all(), request.user),
+        'section_rows':             SectionRows(Section.objects.all().prefetch_related('student_set'), request.user),
         'include_past_sections':    request.GET.get('include', 'future') == 'all',
-        'show_students':            request.user.is_authenticated or request.user.is_staff
+        'show_students':            request.user.is_authenticated or request.user.is_staff,
+        'show_internal_links':      True,
     })
 
 

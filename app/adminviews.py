@@ -1,5 +1,4 @@
 from urllib.parse import urlencode
-from app.sections import SectionRows
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
@@ -8,6 +7,7 @@ from django.views.generic import View
 from django.core.mail import EmailMultiAlternatives
 import html2text
 from app.models import Parent, Section
+from app.sections import SectionRows
 
 
 class Admin(View):
@@ -41,6 +41,7 @@ class AdminEmail(View):
                 'signup_url':   signup_url,
                 'section_rows': rows,
                 'show_students': True,
+                'show_internal_links': False,
             })
             text_content = html2text.html2text(html_content)
 

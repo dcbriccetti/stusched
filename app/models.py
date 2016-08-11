@@ -138,10 +138,6 @@ class Student(models.Model):
     def courses_wanted(self):
         return ', '.join([course.name for course in self.wants_courses.all().order_by('name')])
 
-    @property
-    def section_rows(self):
-        return SectionRows(self.sections.all(), None)
-
     def __str__(self):
         return self.name.__str__()
 
@@ -192,5 +188,5 @@ class AugmentedSsa:
 
 def augmented_student_section_assignments(section_id):
     'Return AugmentedSsa objects for a section'
-    ssas = StudentSectionAssignment.objects.filter(section_id=section_id).order_by('applied_time')
+    ssas = StudentSectionAssignment.objects.filter(section_id=section_id).order_by('applied_time').select_related('section', 'student')
     return [AugmentedSsa(ssa, seq >= ssa.section.max_students) for seq, ssa in enumerate(ssas)]

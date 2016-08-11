@@ -1,7 +1,9 @@
 <table class="table">
     <thead>
     <tr>
+    {% if show_internal_links %}
         <th></th>
+    {% endif %}
         <th>When</th>
         <th>Course</th>
     {% if show_status %}
@@ -18,16 +20,18 @@
     <tbody>
     {% for row in section_rows %}
         <tr>
+        {% if show_internal_links %}
             <td>
                 {% if user.is_staff or row.viewable %}
                 <a href='/app/section/{{ row.section.id }}'><span class="glyphicon glyphicon-eye-open" title="View section details"></span></a>
                 {% endif %}
 
-                {% if row.section.registration_open and user.is_authenticated %}
+                {% if row.section.registration_open and user.is_authenticated and not user.is_staff %}
                     <a title='Change Registration'
                        class='btn btn-primary btn-xs' role="button" href='/app/section/{{ row.section.id }}/register'>Reg</a>
                 {% endif %}
             </td>
+        {% endif %}
             <td>{{ row.section.when }}</td>
             <td>
                 {% if row.section.course.url %}
