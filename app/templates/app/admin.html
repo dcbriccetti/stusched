@@ -5,7 +5,57 @@
 
 {% block content %}
     {% if user.is_staff %}
-        <p></p>
+        <h2>Status</h2>
+        <table class="table table-nonfluid">
+            <tbody>
+                <tr>
+                    <td>Parents</td>
+                    <td>{{ status.num_parents }}</td>
+                </tr>
+                <tr>
+                    <td>Linked Parents</td>
+                    <td>{{ status.num_linked_parents }}</td>
+                </tr>
+                <tr>
+                    <td>Students</td>
+                    <td>{{ status.num_students }}</td>
+                </tr>
+                <tr>
+                    <td>Upcoming Sections</td>
+                    <td>{{ status.num_upcoming_sections }}</td>
+                </tr>
+                <tr>
+                    <td>Students in Upcoming Sections</td>
+                    <td>{{ status.num_accepted_upcoming }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Applications</h2>
+        <table class="table table-nonfluid">
+            <thead>
+            <tr>
+                <th>Application Time</th>
+                <th>Student</th>
+                <th>Section Time</th>
+                <th>Course Name</th>
+                <th>Section Notes</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for ssa in ssas %}
+                <tr>
+                    <td>{{ ssa.applied_time }}</td>
+                    <td>{{ ssa.student.name }}</td>
+                    <td>{{ ssa.section.when }}</td>
+                    <td>{{ ssa.section.course }}</td>
+                    <td>{{ ssa.section.notes }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Email</h2>
         <a class="btn btn-primary" role="button" href="/app/admin/email">Send Status Emails</a>
     {% endif %}
 {% endblock %}

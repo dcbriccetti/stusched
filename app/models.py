@@ -159,8 +159,10 @@ class Knows(models.Model):
         return '%s %s %d' % (self.student.name, self.item.name, self.quantity)
 
 
+SS_STATUS_APPLIED  = 1
 SS_STATUS_ACCEPTED = 2
-SS_STATUSES = ((1, 'Applied'), (SS_STATUS_ACCEPTED, 'Accepted'), (3, 'Rejected'))
+SS_STATUS_REJECTED = 3
+SS_STATUSES = ((SS_STATUS_APPLIED, 'Applied'), (SS_STATUS_ACCEPTED, 'Accepted'), (SS_STATUS_REJECTED, 'Rejected'))
 SS_STATUSES_BY_ID = {item[0]: item[1] for item in SS_STATUSES}
 
 

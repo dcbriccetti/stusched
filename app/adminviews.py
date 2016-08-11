@@ -1,3 +1,4 @@
+from datetime import datetime
 from urllib.parse import urlencode
 from django.core import mail
 from django.core.urlresolvers import reverse
@@ -6,13 +7,27 @@ from django.template.loader import get_template
 from django.views.generic import View
 from django.core.mail import EmailMultiAlternatives
 import html2text
-from app.models import Parent, Section
+from app.models import Parent, Student, Section, StudentSectionAssignment, SS_STATUS_APPLIED, SS_STATUS_ACCEPTED
 from app.sections import SectionRows
 
 
 class Admin(View):
     def get(self, request):
-        return render(request, 'app/admin.html')
+        class Status:
+            def __init__(self):
+                self.num_parents = Parent.objects.count()
+                self.num_linked_parents = Parent.objects.filter(users__isnull=False).count()
+                self.num_students = Student.objects.count()
+                self.num_upcoming_sections = Section.objects.filter(start_time__gt=datetime.now()).count()
+                self.num_accepted_upcoming = StudentSectionAssignment.objects.filter(status=SS_STATUS_ACCEPTED,
+                    section__start_time__gt=datetime.now()).count()
+
+        ssas = StudentSectionAssignment.objects.filter(status=SS_STATUS_APPLIED)\
+            .order_by('applied_time').select_related('section', 'student', 'section__course')
+        return render(request, 'app/admin.html', {
+            'ssas':     ssas,
+            'status':   Status(),
+        })
 
 
 class AdminEmail(View):
