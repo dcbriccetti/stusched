@@ -8,26 +8,12 @@
         <h2>Status</h2>
         <table class="table table-nonfluid">
             <tbody>
+            {% for row in status %}
                 <tr>
-                    <td>Parents</td>
-                    <td>{{ status.num_parents }}</td>
+                    <td>{{ row.0 }}</td>
+                    <td>{{ row.1 }}</td>
                 </tr>
-                <tr>
-                    <td>Linked Parents</td>
-                    <td>{{ status.num_linked_parents }}</td>
-                </tr>
-                <tr>
-                    <td>Students</td>
-                    <td>{{ status.num_students }}</td>
-                </tr>
-                <tr>
-                    <td>Upcoming Sections</td>
-                    <td>{{ status.num_upcoming_sections }}</td>
-                </tr>
-                <tr>
-                    <td>Students in Upcoming Sections</td>
-                    <td>{{ status.num_accepted_upcoming }}</td>
-                </tr>
+            {% endfor %}
             </tbody>
         </table>
 

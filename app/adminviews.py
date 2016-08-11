@@ -13,20 +13,20 @@ from app.sections import SectionRows
 
 class Admin(View):
     def get(self, request):
-        class Status:
-            def __init__(self):
-                self.num_parents = Parent.objects.count()
-                self.num_linked_parents = Parent.objects.filter(users__isnull=False).count()
-                self.num_students = Student.objects.count()
-                self.num_upcoming_sections = Section.objects.filter(start_time__gt=datetime.now()).count()
-                self.num_accepted_upcoming = StudentSectionAssignment.objects.filter(status=SS_STATUS_ACCEPTED,
-                    section__start_time__gt=datetime.now()).count()
+        status = (
+            ('Parents',                         Parent.objects.count()),
+            ('Linked Parents',                  Parent.objects.filter(users__isnull=False).count()),
+            ('Students',                        Student.objects.count()),
+            ('Upcoming Sections',               Section.objects.filter(start_time__gt=datetime.now()).count()),
+            ('Students in Upcoming Sections',   StudentSectionAssignment.objects.filter(status=SS_STATUS_ACCEPTED,
+                                                    section__start_time__gt=datetime.now()).count()),
+        )
 
         ssas = StudentSectionAssignment.objects.filter(status=SS_STATUS_APPLIED)\
             .order_by('applied_time').select_related('section', 'student', 'section__course')
         return render(request, 'app/admin.html', {
             'ssas':     ssas,
-            'status':   Status(),
+            'status':   status,
         })
 
 
