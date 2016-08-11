@@ -42,6 +42,12 @@
         </table>
 
         <h2>Email</h2>
-        <a class="btn btn-primary" role="button" href="/app/admin/email">Send Status Emails</a>
+        <form method="post">
+            {% csrf_token %}
+            <p><input type="checkbox" name="send-to-admin"/> Send email to administrator instead of parents</p>
+            {% buttons %}
+                <button type="submit" name="send-status-emails" class="btn btn-primary">Send Status Emails</button>
+            {% endbuttons %}
+        </form>
     {% endif %}
 {% endblock %}
