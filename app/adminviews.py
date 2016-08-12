@@ -61,13 +61,14 @@ class Admin(View):
                         'signup_url':   signup_url,
                         'section_rows': rows,
                         'show_students': True,
+                        'show_status':  True,
                         'show_internal_links': False,
                     })
                     text_content = html2text.html2text(html_content)
 
                     msg = EmailMultiAlternatives('Status of Dave B’s Young Programmers', text_content,
                         'Dave B’s Student Information System <daveb@davebsoft.com>', ['%s <%s>' %
-                                                                                      (parent.name, 'daveb@davebsoft.com' if send_to_admin else parent.email)])
+                        (parent.name, 'daveb@davebsoft.com' if send_to_admin else parent.email)])
                     msg.attach_alternative(html_content, "text/html")
                     msgs.append(msg)
 
