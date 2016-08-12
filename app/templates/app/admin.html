@@ -48,6 +48,8 @@
                 <label for="sta">Send email to administrator instead of parents</label></p>
             <p><input type="checkbox" id='saf' name="send-a-fraction"/>
                 <label for="saf">If above checked, send just a fraction of the emails</label></p>
+            <p><input type="checkbox" id='sou' name="send-only-upcoming"/>
+                <label for="sou">Include only parents with students with upcoming events</label></p>
             {% buttons %}
                 <button type="submit" name="send-status-emails" class="btn btn-primary">Send Status Emails</button>
             {% endbuttons %}

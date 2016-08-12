@@ -40,12 +40,12 @@ class Admin(View):
             connection.open()
             msgs = []
             sections = Section.objects.all()
-            send_to_admin   = 'send-to-admin'  in request.POST
-            send_a_fraction = 'send-a-fraction' in request.POST
-            send_all = not (send_to_admin and send_a_fraction)
+            send_to_admin = 'send-to-admin' in request.POST
+            send_a_fraction = send_to_admin and 'send-a-fraction' in request.POST
+            send_only_upcoming = 'send-only-upcoming' in request.POST
 
             for parent in parents:
-                if send_all or random.random() < .15:  # Send a fraction when testing
+                if (not send_only_upcoming or parent.has_upcoming) and (not send_a_fraction or random.random() < .15):
                     user = parent.users.first()
                     signup_url = dbsis_url + '/app/login?' + urlencode({
                         'name':         parent.name,
@@ -67,7 +67,7 @@ class Admin(View):
 
                     msg = EmailMultiAlternatives('Status of Dave B’s Young Programmers', text_content,
                         'Dave B’s Student Information System <daveb@davebsoft.com>', ['%s <%s>' %
-                        (parent.name, 'daveb@davebsoft.com' if send_to_admin else parent.email)])
+                                                                                      (parent.name, 'daveb@davebsoft.com' if send_to_admin else parent.email)])
                     msg.attach_alternative(html_content, "text/html")
                     msgs.append(msg)
 

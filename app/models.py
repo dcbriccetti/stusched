@@ -92,6 +92,10 @@ class Parent(models.Model):
     def students_sorted(self):
         return self.student_set.all().order_by('name')
 
+    @property
+    def has_upcoming(self):
+        return self.student_set.filter(sections__start_time__gt=datetime.now()).count() > 0
+
     active.boolean = True
 
 
