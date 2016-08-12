@@ -40,10 +40,12 @@ class Admin(View):
             connection.open()
             msgs = []
             sections = Section.objects.all()
-            send_to_admin = 'send-to-admin' in request.POST
+            send_to_admin   = 'send-to-admin'  in request.POST
+            send_a_fraction = 'send-a-fraction' in request.POST
+            send_all = not (send_to_admin and send_a_fraction)
 
             for parent in parents:
-                if not send_to_admin or random.random() < .15:  # Send a fraction to admin when testing
+                if send_all or random.random() < .15:  # Send a fraction when testing
                     user = parent.users.first()
                     signup_url = dbsis_url + '/app/login?' + urlencode({
                         'name':         parent.name,
@@ -53,6 +55,7 @@ class Admin(View):
 
                     rows = SectionRows(sections, user)
                     html_content = status_template.render({
+                        'user':         user,
                         'parent':       parent,
                         'dbsis_url':    dbsis_url,
                         'signup_url':   signup_url,

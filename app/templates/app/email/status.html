@@ -2,35 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <style>
+        table {
+            border-collapse: collapse;
+            border: 1px solid gray;
+        }
+
+        table th, table td {
+            border: 1px solid gray;
+            padding: .2em .4em;
+        }
+    </style>
 </head>
 <body>
 
-<p>Hello, {{ parent.name }}. Here’s the status of things with Dave B’s Young Programmers.</p>
+<p>Hello, {{ parent.name }}{% if user %} ({{ user.username }}){% endif %}.
+    Here’s the latest with Dave B’s Young Programmers.</p>
 {% with num_stu=parent.student_set.count %}
     {% if num_stu %}
-<p>You have {{ num_stu }} young programmer{{ num_stu|pluralize }} in the student information system:</p>
+<p>Your students in the system:</p>
 <ul>
     {% for student in parent.student_set.all %}
     <li>{{ student.name }}</li>
     {% endfor %}
 </ul>
     {% else %}
-    <p>You have no young programmers in the student information system.</p>
+<p>You have no young programmers in the student information system.</p>
     {% endif %}
-{% endwith %}
 
 {% if section_rows.future %}
-    <h2>Upcoming Course Sections</h2>
+<h2>Upcoming Course Sections</h2>
     {% include "app/section_table.html" with section_rows=section_rows.future %}
 {% endif %}
 
 <h2>Dave B’s Student Information System</h2>
 {% if signup_url %}
-    You can <a href="{{ signup_url }}">create an account</a>, linking it to information you have already
-    provided.
+    To use the system please <a href="{{ signup_url }}">create an account using this link</a>,
+    and your new account will be connected to information already in the system.
 {% else %}
-    <a href="{{ dbsis_url }}">Go to Dave B’s Student Information System</a>
+    <a href="{{ dbsis_url }}">Go to Dave B’s Student Information System</a> to keep your information up
+    to date, and to enroll in course sections.
 {% endif %}
+{% endwith %}
 
 <p>To turn off these emails, please email <a href="mailto:daveb@davebsoft.com">Dave Briccetti</a>.</p>
 
