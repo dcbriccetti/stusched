@@ -2,12 +2,18 @@ import re
 from datetime import date, datetime, timedelta
 from django.db import models
 from django.contrib.auth.models import User
-from app.sections import SectionRows
 
 DAYS_PER_YEAR = 365.24
 
 
-class Course(models.Model):
+class Timestamped(models.Model):
+    added = models.DateTimeField(auto_now_add=True, null=True)
+    updated = models.DateTimeField(auto_now=True, null=True)
+
+    class Meta:
+        abstract = True
+
+class Course(Timestamped):
     name = models.CharField(max_length=100)
     url = models.URLField(blank=True)
     active = models.BooleanField(default=True)
@@ -18,7 +24,7 @@ class Course(models.Model):
 STATUSES = ((1, 'Proposed'), (2, 'Accepting'), (3, 'Scheduled'))
 
 
-class Section(models.Model):
+class Section(Timestamped):
     start_time = models.DateTimeField()
     hours_per_day = models.DecimalField(max_digits=4, decimal_places=2)
     num_days = models.IntegerField(default=1)
@@ -70,7 +76,7 @@ class Section(models.Model):
         return result
 
 
-class Parent(models.Model):
+class Parent(Timestamped):
     name = models.CharField(max_length=100, help_text='Full name of one or more parents.')
     phone = models.CharField(max_length=100, null=True, blank=True, help_text='Used for emergency contact or by prior arrangement.')
     email = models.EmailField(null=True, blank=True)
@@ -99,7 +105,7 @@ class Parent(models.Model):
     active.boolean = True
 
 
-class Student(models.Model):
+class Student(Timestamped):
     name            = models.CharField(max_length=100, help_text='The student’s full name.')
     active          = models.BooleanField(default=True)
     birthdate       = models.DateField(null=True, blank=True, help_text='Used so the system always knows the student’s current age.')
@@ -146,7 +152,7 @@ class Student(models.Model):
         return self.name.__str__()
 
 
-class KnowledgeItem(models.Model):
+class KnowledgeItem(Timestamped):
     name        = models.CharField(max_length=100)
     students    = models.ManyToManyField(Student, through='Knows')
 
@@ -154,7 +160,7 @@ class KnowledgeItem(models.Model):
         return self.name.__str__()
 
 
-class Knows(models.Model):
+class Knows(Timestamped):
     student     = models.ForeignKey(Student, on_delete=models.CASCADE)
     item        = models.ForeignKey(KnowledgeItem, on_delete=models.CASCADE)
     quantity    = models.IntegerField()
@@ -170,7 +176,7 @@ SS_STATUSES = ((SS_STATUS_APPLIED, 'Applied'), (SS_STATUS_ACCEPTED, 'Accepted'),
 SS_STATUSES_BY_ID = {item[0]: item[1] for item in SS_STATUSES}
 
 
-class StudentSectionAssignment(models.Model):
+class StudentSectionAssignment(Timestamped):
     class Meta:
         db_table = 'app_student_section'
 
