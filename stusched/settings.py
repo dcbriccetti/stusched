@@ -20,6 +20,8 @@ ALLOWED_HOSTS = ['dbsis.herokuapp.com', '127.0.0.1']
 
 # Application definition
 
+USE_DJANGO_TOOLBAR = False
+TOOLBAR_APPS = ('debug_toolbar',) if USE_DJANGO_TOOLBAR else ()
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -29,7 +31,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'app',
     'bootstrap3',
-)
+) + TOOLBAR_APPS
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
