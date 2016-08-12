@@ -28,7 +28,7 @@
 
                 {% if row.section.registration_open and user.is_authenticated and not user.is_staff %}
                     <a title='Change Registration'
-                       class='btn btn-primary btn-xs' role="button" href='/app/section/{{ row.section.id }}/register'>Reg</a>
+                       class='chg-reg btn btn-primary btn-xs' role="button" href='/app/section/{{ row.section.id }}/register'>Reg</a>
                 {% endif %}
             </td>
         {% endif %}
@@ -62,7 +62,7 @@
                 <span class='text-muted' style="font-size: 70%"> ≤ {{ row.section.max_students }}</span>
             </td>
             {% if show_students %}
-            <td>{{ row.students }}</td>
+            <td class="student-names">{{ row.students }}</td>
             {% endif %}
             <td>{{ row.section.notes }}</td>
         </tr>

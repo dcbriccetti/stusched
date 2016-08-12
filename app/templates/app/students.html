@@ -44,6 +44,6 @@
         {% endwith %}
         </div>
     {% endfor %}
-    <a class='btn btn-primary btn-sm' role="button" href='{% url 'student' 0%}?parent_id={{ parent.id }}'>Add a student</a>
+    <a id='add' class='btn btn-primary btn-sm' role="button" href='{% url 'student' 0%}?parent_id={{ parent.id }}'>Add a student</a>
 {% endfor %}
 {% endblock %}

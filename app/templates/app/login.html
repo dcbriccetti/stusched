@@ -6,21 +6,21 @@
 {% block content %}
 
     <h2>Log In</h2>
-    <form action="/app/login" method="post">
+    <form id='log-in-form' action="/app/login" method="post">
         {% csrf_token %}
         {% bootstrap_form form %}
         {% buttons %}
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button id='log-in' type="submit" class="btn btn-primary">Submit</button>
         {% endbuttons %}
         <input type="hidden" name="next" value="{{ next }}" />
     </form>
 
     <h2>Create New Account</h2>
-    <form action="/app/login?create=y" method="post">
+    <form id='create-form' action="/app/login?create=y" method="post">
         {% csrf_token %}
         {% bootstrap_form new_user_form %}
         {% buttons %}
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button id='create' type="submit" class="btn btn-primary">Submit</button>
         {% endbuttons %}
         <input type="hidden" name="next" value="{{ next }}" />
     </form>
