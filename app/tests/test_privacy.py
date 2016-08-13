@@ -1,47 +1,72 @@
 from time import sleep
-from app.factories import StudentFactory, ParentFactory
-from django.test import TestCase, LiveServerTestCase
+
+from app.factories import StudentFactory, ParentFactory, SectionFactory, UserFactory
+from django.test import LiveServerTestCase
 from django.contrib.auth.models import User
-from app.models import Student, Parent, Course, Section, StudentSectionAssignment, SS_STATUS_APPLIED, SS_STATUS_ACCEPTED
+from app.models import Course, StudentSectionAssignment, SS_STATUS_ACCEPTED
 from selenium import webdriver
 
 
+class Ups:
+    'User, parent, student in a section'
+    def __init__(self, section=None):
+        self.user = UserFactory.create()
+        self.parent = ParentFactory()
+        self.parent.users.add(self.user)
+        self.stu = StudentFactory.create(parent=self.parent)
+
+        if section:
+            StudentSectionAssignment.objects.create(student=self.stu, section=section, status=SS_STATUS_ACCEPTED)
+
+
 class BrowserTest(LiveServerTestCase):
+
+    def setUp(self):
+        self.b = webdriver.Firefox()
+
+    def tearDown(self):
+        self.b.quit()
+
     def test_accepted_student_sees_others(self):
-        course = Course.objects.create(name='Python')
-        section = Section.objects.create(course=course, start_time='2016-08-30T13:00:00', scheduled_status=1,
-            hours_per_day=3, num_days=1)
-        other_user = User.objects.create(username='mrsother', email='x@x.com')
-        other_parent = ParentFactory()
-        other_parent.users.add(other_user)
-        other_stu = StudentFactory.create(parent=other_parent)
-        other_ssa = StudentSectionAssignment.objects.create(student=other_stu, section=section, status=SS_STATUS_APPLIED)
-        username = "mom"
-        password = "mom"
-        b = webdriver.Firefox()
-        b.get("%s/app/login" % self.live_server_url)
-        id  = b.find_element_by_id
-        sel = b.find_element_by_css_selector
-        sel('#create-form #id_name').send_keys('Mom')
-        sel('#create-form #id_email').send_keys('daveb@davebsoft.com')
-        sel('#create-form #id_username').send_keys(username)
-        sel('#create-form #id_password').send_keys(password)
-        sel('#create-form #create').click()
-        b.get("%s/app/students" % self.live_server_url)
-        id('add').click()
-        id('id_name').send_keys('Student A')
-        id('id_birthdate').send_keys('2001-05-06')
-        id('id_grade_from_age').send_keys('5')
-        sel('button').click()
-        b.get("%s/app/sections" % self.live_server_url)
-        sel('.chg-reg').click()
-        sel('.apply').click()
-        b.get("%s/app/sections" % self.live_server_url)
-        self.assertEqual('Applied: Student A', sel('.student-names').text)
-        for ssa in StudentSectionAssignment.objects.all():
-            ssa.status=SS_STATUS_ACCEPTED
-            ssa.save()
-        b.get("%s/app/sections" % self.live_server_url)
-        student_names = sel('.student-names').text
-        b.quit()
-        self.assertEqual('Student A, ' + other_stu.name, student_names)
+        'The parent of a student accepted into a section can see all accepted students in that section.'
+
+        section = SectionFactory.create(course=Course.objects.create(name='Python'))
+        u1 = Ups(section)
+        u2 = Ups(section)
+
+        self.log_in(u1.user.username)
+        self.b.get("%s/app/sections" % self.live_server_url)
+        expected_names = sorted([u1.stu.name, u2.stu.name])
+        self.assertEqual(', '.join(expected_names), self.student_names())
+
+    def test_staff_sees_all(self):
+        'A staff user can see all students in a section.'
+
+        section = SectionFactory.create(course=Course.objects.create(name='Python'))
+        u1 = Ups(section)
+        User.objects.create_superuser(username='admin', password='password', email='')
+
+        self.log_in(u1.user.username)
+        self.b.get("%s/app/sections" % self.live_server_url)
+        expected_names = sorted([u1.stu.name])
+        self.assertEqual(', '.join(expected_names), self.student_names())
+
+    def test_student_not_in_section_sees_no_names(self):
+        section = SectionFactory.create(course=Course.objects.create(name='Python'))
+        u1 = Ups(section)
+        u2 = Ups()
+
+        self.log_in(u2.user.username)
+        self.b.get("%s/app/sections" % self.live_server_url)
+        self.assertEqual('', self.student_names())
+
+    def student_names(self):
+        return self.b.find_element_by_css_selector('.student-names').text
+
+    def log_in(self, username):
+        self.b.get("%s/app/login" % self.live_server_url)
+        sel = self.b.find_element_by_css_selector
+        sel('#log-in-form #id_username').send_keys(username)
+        sel('#log-in-form #id_password').send_keys('password')
+        sel('#log-in-form #log-in').click()
+        return sel
