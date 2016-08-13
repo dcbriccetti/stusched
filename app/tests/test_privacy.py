@@ -25,7 +25,6 @@ class BrowserTest(LiveServerTestCase):
         self.b = webdriver.Firefox()
 
     def tearDown(self):
-        sleep(1)
         self.b.quit()
 
     def test_accepted_student_sees_others(self):

@@ -56,9 +56,14 @@ class CourseAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     inlines = (SectionInline,)
 
+
+class NewsItemAdmin(admin.ModelAdmin):
+    list_display = ('title', 'updated', 'text')
+
 admin.site.register(Course,  CourseAdmin)
 admin.site.register(Section, SectionAdmin)
 admin.site.register(Parent,  ParentAdmin)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Knows,   KnowsAdmin)
 admin.site.register(KnowledgeItem)
+admin.site.register(NewsItem, NewsItemAdmin)

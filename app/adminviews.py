@@ -8,7 +8,8 @@ from django.template.loader import get_template
 from django.views.generic import View
 from django.core.mail import EmailMultiAlternatives
 import html2text
-from app.models import Parent, Student, Section, StudentSectionAssignment, SS_STATUS_APPLIED, SS_STATUS_ACCEPTED
+from app.models import Parent, Student, Section, StudentSectionAssignment, SS_STATUS_APPLIED, SS_STATUS_ACCEPTED, \
+    NewsItem
 from app.sections import SectionRows
 
 
@@ -63,6 +64,7 @@ class Admin(View):
                         'show_students': True,
                         'show_status':  True,
                         'show_internal_links': False,
+                        'news_items':   NewsItem.objects.all().order_by('-updated'),
                     })
                     text_content = html2text.html2text(html_content)
 

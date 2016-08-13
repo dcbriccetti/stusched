@@ -2,6 +2,7 @@ import re
 from datetime import date, datetime, timedelta
 from django.db import models
 from django.contrib.auth.models import User
+import markdown
 
 DAYS_PER_YEAR = 365.24
 
@@ -202,3 +203,10 @@ def augmented_student_section_assignments(section_id):
     'Return AugmentedSsa objects for a section'
     ssas = StudentSectionAssignment.objects.filter(section_id=section_id).order_by('applied_time').select_related('section', 'student')
     return [AugmentedSsa(ssa, seq >= ssa.section.max_students) for seq, ssa in enumerate(ssas)]
+
+class NewsItem(Timestamped):
+    title = models.CharField(max_length=200, blank=True, null=True)
+    text = models.TextField()  # Markdown text
+
+    def as_html(self):
+        return markdown.markdown(self.text)

@@ -1,0 +1,18 @@
+<table class="table table-nonfluid">
+<thead>
+<tr>
+    <th>Title</th>
+    <th>Time</th>
+    <th>Item</th>
+</tr>
+</thead>
+<tbody>
+{% for item in news_items %}
+    <tr>
+    <td>{{ item.title }}</td>
+    <td>{{ item.updated }}</td>
+    <td>{{ item.as_html | safe }}</td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>

@@ -25,6 +25,7 @@
         {% if user.is_staff %}
         <li role="presentation" class={% active_nav request 'admin'     %}><a href="{% url 'admin'     %}">Admin</a></li>
         {% endif %}
+        <li role="presentation" class={% active_nav request 'news'      %}><a href="{% url 'news'      %}">News</a></li>
         {% if not user.is_staff %}
         <li role="presentation" class={% active_nav request 'parent'    %}><a href="{% url 'parent'    %}">Parent</a></li>
         {% endif %}

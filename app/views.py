@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.views.generic import View
 from app.students import students_of_parent
-from .models import Course, Section, Parent, SS_STATUS_ACCEPTED, StudentSectionAssignment
+from .models import NewsItem, Course, Section, Parent, SS_STATUS_ACCEPTED, StudentSectionAssignment
 from .models import Student as StudentModel
 from .forms import AuthenticationForm, NewUserForm, StudentForm, ParentForm
 
@@ -327,3 +327,10 @@ class Calendar(View):
         }, content_type="text/icalendar")
         response['Content-Disposition'] = 'attachment; filename="event.ics"'
         return response
+
+
+class NewsView(View):
+    def get(self, request):
+        return render(request, 'app/news.html', {
+            'news_items': NewsItem.objects.all().order_by('-updated'),
+        })
