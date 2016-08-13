@@ -25,21 +25,26 @@ class SectionRow:
     def __init__(self, section, viewable, user):
         self.section = section
         self.viewable = viewable
+        from app.models import augmented_student_section_assignments, SS_STATUSES_BY_ID, SS_STATUS_ACCEPTED
+
+        def status_from_assa(assa):
+            return assa.ssa.status
+
+        assas = sorted(augmented_student_section_assignments(section.id), key=status_from_assa)
+        accepted_student_ids_in_section = set(
+            [assa.ssa.student_id for assa in assas if assa.ssa.status == SS_STATUS_ACCEPTED])
+        ids_of_students_of_parent = set(s.id for s in students_of_parent(user))
+        parent_has_an_accepted_student_in_this_section = bool(accepted_student_ids_in_section & ids_of_students_of_parent)
+
+        num_statuses = len(set((assa.ssa.status for assa in assas)))
 
         def status_group_names():
-            from app.models import augmented_student_section_assignments, SS_STATUSES_BY_ID, SS_STATUS_ACCEPTED
-            sop = students_of_parent(user) if user else []
-            aug_ssas = augmented_student_section_assignments(section.id)
-            def status_from_assa(assa): return assa.ssa.status
-            aug_ssas.sort(key=status_from_assa)
-            num_statuses = len(set((assa.ssa.status for assa in aug_ssas)))
-
-            for status_id, grouped_assas in groupby(aug_ssas, status_from_assa):
+            for status_id, grouped_assas in groupby(assas, status_from_assa):
                 def fmt_name(assa):
                     return assa.ssa.student.name + (' (waitlist)' if assa.waitlisted else '')
-                def can_show_student(assa):
-                    return assa.ssa.student in sop or (user and user.is_staff)
-                names = [fmt_name(assa) for assa in grouped_assas if can_show_student(assa)]
+                def can_show_student():
+                    return parent_has_an_accepted_student_in_this_section or (user and user.is_staff)
+                names = [fmt_name(assa) for assa in grouped_assas if can_show_student()]
                 if names:
                     names.sort()
                     status_heading = '%s: ' % SS_STATUSES_BY_ID[status_id] if \
