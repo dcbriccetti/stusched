@@ -1,3 +1,4 @@
+import logging
 import random
 from datetime import datetime
 from urllib.parse import urlencode
@@ -11,6 +12,8 @@ import html2text
 from app.models import Parent, Student, Section, StudentSectionAssignment, SS_STATUS_APPLIED, SS_STATUS_ACCEPTED, \
     NewsItem
 from app.sections import SectionRows
+
+log = logging.getLogger(__name__)
 
 
 class Admin(View):
@@ -40,10 +43,11 @@ class Admin(View):
             connection = mail.get_connection()
             connection.open()
             msgs = []
-            sections = Section.objects.all()
+            sections = Section.objects.filter(start_time__gt=datetime.now())
             send_to_admin = 'send-to-admin' in request.POST
             send_a_fraction = send_to_admin and 'send-a-fraction' in request.POST
             send_only_upcoming = 'send-only-upcoming' in request.POST
+            news_items = NewsItem.objects.all().order_by('-updated')
 
             for parent in parents:
                 if (not send_only_upcoming or parent.has_upcoming) and (not send_a_fraction or random.random() < .15):
@@ -64,7 +68,7 @@ class Admin(View):
                         'show_students': True,
                         'show_status':  True,
                         'show_internal_links': False,
-                        'news_items':   NewsItem.objects.all().order_by('-updated'),
+                        'news_items':   news_items,
                     })
                     text_content = html2text.html2text(html_content)
 

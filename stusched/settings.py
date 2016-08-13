@@ -145,7 +145,7 @@ LOGGING = {
         key: {
             'handlers': ['console'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-        } for key in ('app.views', 'app.reg', 'app.models', 'app.students')
+        } for key in ('app.views', 'app.adminviews', 'app.reg', 'app.models', 'app.students', 'app.sections')
     },
 }
 

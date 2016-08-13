@@ -1,8 +1,11 @@
 'Business logic relating to course sections'
 
+import logging
 from datetime import timedelta, datetime
 from itertools import groupby
 from app.students import students_of_parent
+
+log = logging.getLogger(__name__)
 
 
 def get_viewable_section_ids(user):
