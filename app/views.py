@@ -95,9 +95,10 @@ def get_student_wants(user):
             self.student = student
             self.course_ids = course_ids
 
-    students = students_of_parent(user)
-    return [StudentCourseWants(student, set((course.id for course in student.wants_courses.all())))
-            for student in students]
+    def course_ids(student):
+        return student.wants_courses.values_list('id', flat=True)
+
+    return [StudentCourseWants(student, course_ids(student)) for student in students_of_parent(user)]
 
 
 def sections(request):
