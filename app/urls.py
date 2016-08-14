@@ -3,8 +3,8 @@ from . import adminviews, views
 
 urlpatterns = [
     url(r'^$',          views.Index.as_view(),      name='index'),
-    url(r'^login$',     views.Login.as_view(),      name='login'),
-    url(r'^logout$',    views.logOut,               name='log_out'),
+    url(r'^login$',     views.Login.as_view(),      name='log-in'),
+    url(r'^logout$',    views.logOut,               name='log-out'),
     url(r'^courses$',   views.Courses.as_view(),    name='courses'),
     url(r'^admin$',     adminviews.Admin.as_view(), name='admin'),
     url(r'^news$',      views.NewsView.as_view(),   name='news'),

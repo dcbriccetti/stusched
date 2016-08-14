@@ -1,7 +1,6 @@
 from django import forms
-from django.contrib.auth import (
-    authenticate, get_user_model,
-)
+from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth.models import User
 from django.forms import ModelForm
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
@@ -98,6 +97,14 @@ class NewUserForm(forms.Form):
             raise forms.ValidationError(
                 'Unrecognized code. Please enter the code you were given, or leave the field blank.')
         return code
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if User.objects.filter(username=username).first():
+            raise forms.ValidationError('That username already exists.', code=USER_EXISTS_ERROR_CODE)
+        return username
+
+USER_EXISTS_ERROR_CODE = 'user-exists'
 
 
 class ParentForm(ModelForm):
