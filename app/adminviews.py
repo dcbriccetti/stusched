@@ -4,6 +4,7 @@ from datetime import datetime
 from urllib.parse import urlencode
 from django.core import mail
 from django.core.urlresolvers import reverse
+from django.http import Http404
 from django.shortcuts import render, redirect
 from django.template.loader import get_template
 from django.views.generic import View
@@ -18,6 +19,9 @@ log = logging.getLogger(__name__)
 
 class Admin(View):
     def get(self, request):
+        if not request.user.is_staff:
+            raise Http404
+
         status = (
             ('Parents',                         Parent.objects.count()),
             ('Linked Parents',                  Parent.objects.filter(users__isnull=False).count()),
@@ -35,6 +39,9 @@ class Admin(View):
         })
 
     def post(self, request):
+        if not request.user.is_staff:
+            raise Http404
+
         if 'send-status-emails' in request.POST:
             status_template = get_template('app/email/status.html')
             parents = Parent.objects.exclude(email__isnull=True).exclude(email__exact='')

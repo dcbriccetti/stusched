@@ -23,9 +23,37 @@ class BrowserTest(LiveServerTestCase):
 
     def setUp(self):
         self.b = webdriver.Firefox()
+        self.b.implicitly_wait(1)
 
     def tearDown(self):
         self.b.quit()
+
+    def test_admin_only_for_admin(self):
+        def texts(sel):
+            return [el.text for el in self.b.find_elements_by_css_selector(sel)]
+        def nav_texts():
+            return texts('.nav li a')
+        def admin_page_not_found():
+            b.get("%s/app/admin" % self.live_server_url)
+            self.assertIn('Not Found', texts('h1'))
+
+        b = self.b
+        admin_page_not_found()
+
+        b.get("%s/app" % self.live_server_url)
+        self.assertNotIn('Admin', nav_texts())
+
+        User.objects.create_superuser(username='admin', password='password', email='')
+        self.log_in('admin')
+        b.get("%s/app" % self.live_server_url)
+        self.assertIn('Admin', nav_texts())
+
+        user = UserFactory.create()
+        self.log_in(user.username)
+        b.get("%s/app" % self.live_server_url)
+        self.assertNotIn('Admin', nav_texts())
+
+        admin_page_not_found()
 
     def test_accepted_student_sees_others(self):
         'The parent of a student accepted into a section can see all accepted students in that section.'
