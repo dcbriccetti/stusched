@@ -1,13 +1,9 @@
 
-
 def students_of_parent(user):
     from .models import Parent
-    stus = []
+    students = []
     if user and user.is_active and not user.is_staff:  # Skip for missing, anonymous or staff user
-        parents = Parent.objects.filter(users=user)
-        for p in parents:
-            stus += p.students_sorted()
-    stus.sort(key=lambda s: s.name)
-    return stus
-
-
+        for parent in Parent.objects.filter(users=user):
+            students += parent.student_set.all()
+    students.sort(key=lambda s: s.name)
+    return students

@@ -14,6 +14,7 @@ class Timestamped(models.Model):
     class Meta:
         abstract = True
 
+
 class Course(Timestamped):
     name = models.CharField(max_length=100)
     url = models.URLField(blank=True)
@@ -201,7 +202,8 @@ class AugmentedSsa:
 
 def augmented_student_section_assignments(section_id):
     'Return AugmentedSsa objects for a section'
-    ssas = StudentSectionAssignment.objects.filter(section_id=section_id).order_by('applied_time').select_related('section', 'student')
+    ssas = StudentSectionAssignment.objects.filter(section_id=section_id).order_by('applied_time').\
+        select_related('section', 'student', 'section__course')
     return [AugmentedSsa(ssa, seq >= ssa.section.max_students) for seq, ssa in enumerate(ssas)]
 
 class NewsItem(Timestamped):
