@@ -72,10 +72,16 @@ class Courses(View):
 @login_required
 def students(request):
     user = request.user
+    wanted_course_ids = request.GET.getlist('wants', [])
     if user.is_staff:
-        parents = [p for p in Parent.objects.order_by('name').prefetch_related('student_set') if p.active()]
+        parents = [p for p in Parent.objects.order_by('name').prefetch_related('student_set')
+                   if p.active() and p.has_student_wanting(wanted_course_ids)]
     else:
         parents = Parent.objects.filter(users=user)
+
+    for parent in parents:
+        q = parent.student_set.all().order_by('name')
+        parent.students = q.filter(wants_courses__in=wanted_course_ids) if wanted_course_ids else q
 
     return render(request, 'app/students.html', {
         'parents':                  parents,

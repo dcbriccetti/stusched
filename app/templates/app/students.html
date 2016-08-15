@@ -14,7 +14,7 @@
     <hr style="border: medium black solid">
     <h2>{{ parent.name }}</h2>
     {% endif %}
-    {% for student in parent.students_sorted %}
+    {% for student in parent.students %}
         <div class="well">
             <h3 style="margin-top: 0">
                 <a href='{% url 'student' student.id %}'><span title="Edit student profile" class="glyphicon glyphicon-edit"></span></a>

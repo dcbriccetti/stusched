@@ -97,8 +97,11 @@ class Parent(Timestamped):
     def active(self):
         return self.student_set.filter(active=True).count() > 0
 
-    def students_sorted(self):
-        return self.student_set.all().order_by('name')
+    def has_student_wanting(self, wanted_course_ids):
+        if not wanted_course_ids:
+            return True
+
+        return self.student_set.filter(wants_courses__in=wanted_course_ids).count() > 0
 
     @property
     def has_upcoming(self):

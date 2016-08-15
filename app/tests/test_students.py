@@ -1,3 +1,4 @@
+from app.models import Course
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from bs4 import BeautifulSoup
@@ -12,11 +13,14 @@ class StudentsTest(TestCase):
         parent.users.add(user)
         stu1 = StudentFactory.create(parent=parent)
         stu2 = StudentFactory.create(parent=parent)
+        course1 = Course(name='Python')
+        course1.save()
+        stu1.wants_courses.add(course1)
 
-        response = self.client.get(reverse('students'))
+        response = self.client.get(reverse('students') + '?wants=%i' % course1.id)
         self.assertEqual(200, response.status_code)
 
         soup = BeautifulSoup(response.content, 'html.parser')
         text = soup.get_text()
-        for stu in stu1, stu2:
-            self.assertIn(stu.name, text)
+        self.assertIn(stu1.name, text)
+        self.assertNotIn(stu2.name, text)
