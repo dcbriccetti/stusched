@@ -75,7 +75,7 @@ def students(request):
     wanted_course_ids = request.GET.getlist('wants', [])
     if user.is_staff:
         parents = [p for p in Parent.objects.order_by('name').prefetch_related('student_set')
-                   if p.active() and p.has_student_wanting(wanted_course_ids)]
+                   if p.active() and (not wanted_course_ids or p.has_student_wanting(wanted_course_ids))]
     else:
         parents = Parent.objects.filter(users=user)
 

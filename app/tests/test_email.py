@@ -25,16 +25,24 @@ class EmailTest(TestCase):
         stu1a.wants_courses.add(course1)
         py_sec = SectionFactory(course=course1)
         
-        parents = tuple(email_parents(False, False))
+        parents = email_parents(())  # No filters, so all parents should be included
         self.assertIn(parent1, parents)
         self.assertIn(parent2, parents)
 
-        parents = tuple(email_parents(False, True))
+        parents = email_parents((), send_only_upcoming=True)  # No parents have students in upcoming sections
         self.assertNotIn(parent1, parents)
         self.assertNotIn(parent2, parents)
 
         StudentSectionAssignment(student=stu1a, section=py_sec, status=SS_STATUS_APPLIED).save()
 
-        parents = tuple(email_parents(False, True))
+        parents = email_parents((), send_only_upcoming=True)  # parent1 now has a student in an upcoming section
+        self.assertIn(parent1, parents)
+        self.assertNotIn(parent2, parents)
+
+        parents = email_parents((), send_only_wanted_upcoming=True)
+        self.assertNotIn(parent1, parents)
+        self.assertNotIn(parent2, parents)
+
+        parents = email_parents((course1.id,), send_only_wanted_upcoming=True)
         self.assertIn(parent1, parents)
         self.assertNotIn(parent2, parents)

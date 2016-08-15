@@ -53,9 +53,15 @@ class Admin(View):
             news_items = NewsItem.objects.all().order_by('-updated')
 
             send_to_admin = 'send-to-admin' in request.POST
+            send_only_wanted_upcoming = 'send-only-wanted-upcoming' in request.POST
 
-            for parent in email_parents(send_to_admin and 'send-a-fraction' in request.POST,
-                    'send-only-upcoming' in request.POST):
+            upcoming_course_ids = [s.course_id for s in sections]
+
+            for parent in email_parents(
+                    upcoming_course_ids,
+                    send_to_admin and 'send-a-fraction' in request.POST,
+                    'send-only-upcoming' in request.POST, send_only_wanted_upcoming,
+                    ):
                 user = parent.users.first()
                 signup_url = dbsis_url + '/app/login?' + urlencode({'name': parent.name, 'email': parent.email,
                     'parent_code': parent.code}) if parent.code and not user else None
@@ -79,7 +85,23 @@ class Admin(View):
         return redirect(reverse('admin'))
 
 
-def email_parents(send_a_fraction, send_only_upcoming):
-    for parent in Parent.objects.exclude(email__isnull=True).exclude(email__exact=''):
-        if (not send_only_upcoming or parent.has_upcoming) and (not send_a_fraction or random.random() < .15):
-            yield parent
+def passthrough(parents):
+    return filter(lambda _: True, parents)
+
+def random_subset(parents):
+    return filter(lambda _: random.random() < .15, parents)
+
+def upcoming(parents):
+    return filter(lambda parent: parent.has_upcoming, parents)
+
+def upcoming_wanted(upcoming_course_ids):
+    def upcoming_wanted_inner(parents):
+        return filter(lambda parent: parent.has_student_wanting(upcoming_course_ids), parents)
+    return upcoming_wanted_inner
+
+def email_parents(upcoming_course_ids, send_a_fraction=False, send_only_upcoming=False, send_only_wanted_upcoming=False):
+    f1 = random_subset                          if send_a_fraction              else passthrough
+    f2 = upcoming                               if send_only_upcoming           else passthrough
+    f3 = upcoming_wanted(upcoming_course_ids)   if send_only_wanted_upcoming    else passthrough
+
+    return f1(f2(f3(Parent.objects.exclude(email__isnull=True).exclude(email__exact=''))))
