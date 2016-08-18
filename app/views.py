@@ -41,7 +41,7 @@ class Courses(View):
         changed = False
 
         for student in students_of_parent(user):
-            old_wants = wants_by_student[student].course_ids
+            old_wants = set(wants_by_student[student].course_ids)
             new_wants = set()
             # The checkbox names are in the form want-<student ID>-<course ID>
             for key_parts in (key.split('-') for key, _ in request.POST.items() if key.startswith('want-')):
