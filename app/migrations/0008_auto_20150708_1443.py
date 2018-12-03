@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='student',
             name='parent',
-            field=models.ForeignKey(to='app.Parent', default=1),
+            field=models.ForeignKey(to='app.Parent', default=1, on_delete=models.CASCADE),
             preserve_default=False,
         ),
     ]

@@ -1,7 +1,6 @@
 import logging
 from app.sections import SectionRows, get_viewable_section_ids
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.urlresolvers import reverse
 from django.db.models import Count
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
@@ -9,6 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.urls import reverse
 from django.views.generic import View
 from app.students import students_of_parent
 from .models import NewsItem, Course, Section, Parent, SS_STATUS_ACCEPTED, StudentSectionAssignment
@@ -193,7 +193,7 @@ class Login(View):
                 parent.users.add(user)
                 log.info('%s %s created and logged in', user, parent.name)
                 messages.add_message(request, messages.INFO, 'Account created')
-                return redirect(request.POST.get('next') or '/app/')
+                return redirect(request.POST.get('next') or reverse('index'))
             else:
                 return render(request, 'app/login.html', {'form': AuthenticationForm(), 'new_user_form': form})
         else:
@@ -202,7 +202,7 @@ class Login(View):
                 login(request, form.get_user())
                 vp = valid_parent(request.user)
                 log.info('%s %s logged in', request.user, vp.name if vp else '[No parent]')
-                return redirect(request.POST.get('next') or '/app/')
+                return redirect(request.POST.get('next') or reverse('index'))
             else:
                 return render(request, 'app/login.html', {'form': form, 'new_user_form': NewUserForm()})
 
@@ -212,7 +212,7 @@ def logOut(request):
     logout(request)
     messages.add_message(request, messages.INFO, 'You are logged out.')
     log.info('%s logged out', name)
-    return redirect('/')
+    return redirect(reverse('index'))
 
 
 def valid_parent(user):
@@ -224,7 +224,7 @@ class ParentView(LoginRequiredMixin, View):
     def get(self, request):
         parent = valid_parent(request.user)
         if not parent:
-            return redirect('/app/')  # todo error
+            return redirect(reverse('index'))  # todo error
 
         return render(request, 'app/parent.html', {
             'form':       ParentForm(instance=parent),
@@ -234,7 +234,7 @@ class ParentView(LoginRequiredMixin, View):
     def post(self, request):
         parent = valid_parent(request.user)
         if not parent:
-            return redirect('/app/')  # todo error
+            return redirect(reverse('index'))  # todo error
 
         form = ParentForm(data=request.POST, instance=parent)
         if form.is_valid():
@@ -242,7 +242,7 @@ class ParentView(LoginRequiredMixin, View):
             msg = 'Parent information saved.'
             messages.add_message(request, messages.INFO, msg)
             log.info('%s %s %s', request.user, parent.name, msg)
-            return redirect('/app/')
+            return redirect(reverse('index'))
         else:
             return render(request, 'app/parent.html', {
                 'form':         form,
@@ -296,7 +296,7 @@ class Student(LoginRequiredMixin, View):
         else:
             raise Http404('That is not a student you can edit')
 
-        return redirect('/app/students')
+        return redirect(reverse('students'))
 
     @staticmethod
     def _student_ok(parent, user):
@@ -323,7 +323,7 @@ class Register(LoginRequiredMixin, View):
                 rs = RegistrationSetter(request, section_id)
                 rs.set(student, apply)
 
-        return redirect('/app/section/%s/register' % section_id)
+        return redirect(reverse('section') + '%s/register' % section_id)
 
 
 class Calendar(View):

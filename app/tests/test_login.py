@@ -1,5 +1,5 @@
-from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.urls import reverse
 from faker import Factory
 from app.forms import NewUserForm, USER_EXISTS_ERROR_CODE
 

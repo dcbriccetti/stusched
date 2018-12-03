@@ -36,14 +36,8 @@
 {% endif %}
 
 <h2>Dave B’s Student Information System</h2>
-{% if signup_url %}
-    <h3>Please Create an Account</h3>
-    To use the system please <a href="{{ signup_url }}">create an account using this link</a>,
-    and your new account will be connected to information already in the system.
-{% else %}
-    <a href="{{ dbsis_url }}">Go to Dave B’s Student Information System</a> to keep your information up
-    to date, and to enroll in course sections.
-{% endif %}
+<a href="{{ dbsis_url }}">Go to Dave B’s Student Information System</a> to keep your information up
+to date, and to enroll in course sections.
 {% endwith %}
 
 <h2>News</h2>

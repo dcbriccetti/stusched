@@ -2,7 +2,7 @@ from datetime import datetime
 import logging
 from django.contrib import messages
 from app.students import students_of_parent
-from .models import Section, StudentSectionAssignment, augmented_student_section_assignments
+from .models import Section, StudentSectionAssignment, augmented_student_section_assignments, SS_STATUS_APPLIED
 
 log = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ class RegistrationSetter:
 
         if turn_on and not current_assignment:
             new_ssa = StudentSectionAssignment(student=student, section=self.section,
-                    status=1, applied_time=datetime.now())
+                    status=SS_STATUS_APPLIED, applied_time=datetime.now())
             new_ssa.save()
             msg = '%s applied for %s.' % (student.name, self.section)
             messages.add_message(self.request, messages.INFO, msg)

@@ -6,7 +6,7 @@
 {% block content %}
 
     <h2>Log In</h2>
-    <form id='log-in-form' action="/app/login" method="post">
+    <form id='log-in-form' action="{% url 'log-in' %}" method="post">
         {% csrf_token %}
         {% bootstrap_form form %}
         {% buttons %}
@@ -16,7 +16,7 @@
     </form>
 
     <h2>Create New Account</h2>
-    <form id='create-form' action="/app/login?create=y" method="post">
+    <form id='create-form' action="{% url 'log-in' %}?create=y" method="post">
         {% csrf_token %}
         {% bootstrap_form new_user_form %}
         {% buttons %}

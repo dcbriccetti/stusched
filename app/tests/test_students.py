@@ -1,6 +1,6 @@
 from app.models import Course
-from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.urls import reverse
 from bs4 import BeautifulSoup
 from app.factories import StudentFactory, ParentFactory, UserFactory
 

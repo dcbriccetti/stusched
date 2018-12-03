@@ -30,7 +30,7 @@ class Section(Timestamped):
     start_time = models.DateTimeField()
     hours_per_day = models.DecimalField(max_digits=4, decimal_places=2)
     num_days = models.IntegerField(default=1)
-    course = models.ForeignKey(Course)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
     price = models.IntegerField(null=True, blank=True)
     min_students = models.IntegerField(default=3)
     max_students = models.IntegerField(default=6)
@@ -117,7 +117,7 @@ class Student(Timestamped):
     grade_from_age  = models.IntegerField(null=True, blank=True,
         help_text='The number to subtract from the student’s age on September 1st to calculate the grade (usually 5).')
     school          = models.CharField(max_length=100, null=True, blank=True, help_text='This is nice for the teacher to know, but isn’t required.')
-    parent          = models.ForeignKey(Parent)
+    parent          = models.ForeignKey(Parent, on_delete=models.CASCADE)
     email           = models.EmailField(null=True, blank=True, help_text='This makes it more convenient for the teacher to communicate with the student, but isn’t required.')
     aptitude        = models.IntegerField(null=True, blank=True)
     sections        = models.ManyToManyField(Section, blank=True, through='StudentSectionAssignment')

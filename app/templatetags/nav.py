@@ -1,5 +1,5 @@
-from django.core.urlresolvers import resolve
 from django.template import Library
+from django.urls import resolve
 
 register = Library()
 

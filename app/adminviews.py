@@ -1,12 +1,11 @@
 import logging
 import random
 from datetime import datetime
-from urllib.parse import urlencode
 from django.core import mail
-from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.shortcuts import render, redirect
 from django.template.loader import get_template
+from django.urls import reverse
 from django.views.generic import View
 from django.core.mail import EmailMultiAlternatives
 import html2text
@@ -44,7 +43,7 @@ class Admin(View):
 
         if 'send-status-emails' in request.POST:
             status_template = get_template('app/email/status.html')
-            dbsis_url = 'https://dbsis.herokuapp.com'
+            dbsis_url = 'https://' + request.get_host() + reverse('index')
 
             connection = mail.get_connection()
             connection.open()
@@ -63,12 +62,10 @@ class Admin(View):
                     'send-only-upcoming' in request.POST, send_only_wanted_upcoming,
                     ):
                 user = parent.users.first()
-                signup_url = dbsis_url + '/app/login?' + urlencode({'name': parent.name, 'email': parent.email,
-                    'parent_code': parent.code}) if parent.code and not user else None
 
                 rows = SectionRows(sections, user)
                 html_content = status_template.render(
-                    {'user': user, 'parent': parent, 'dbsis_url': dbsis_url, 'signup_url': signup_url,
+                    {'user': user, 'parent': parent, 'dbsis_url': dbsis_url,
                         'section_rows': rows, 'show_students': True, 'show_status': True,
                         'show_internal_links': False, 'news_items': news_items, })
                 text_content = html2text.html2text(html_content)
@@ -88,16 +85,20 @@ class Admin(View):
 def passthrough(parents):
     return filter(lambda _: True, parents)
 
+
 def random_subset(parents):
-    return filter(lambda _: random.random() < .15, parents)
+    return filter(lambda _: random.random() < .05, parents)
+
 
 def upcoming(parents):
     return filter(lambda parent: parent.has_upcoming, parents)
+
 
 def upcoming_wanted(upcoming_course_ids):
     def upcoming_wanted_inner(parents):
         return filter(lambda parent: parent.has_student_wanting(upcoming_course_ids), parents)
     return upcoming_wanted_inner
+
 
 def email_parents(upcoming_course_ids, send_a_fraction=False, send_only_upcoming=False, send_only_wanted_upcoming=False):
     f1 = random_subset                          if send_a_fraction              else passthrough

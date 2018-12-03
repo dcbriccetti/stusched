@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', auto_created=True, serialize=False, primary_key=True)),
                 ('start_date', models.DateTimeField()),
-                ('course', models.ForeignKey(to='app.Course')),
+                ('course', models.ForeignKey(to='app.Course', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -39,8 +39,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', auto_created=True, serialize=False, primary_key=True)),
                 ('name', models.CharField(max_length=100)),
-                ('parent', models.ForeignKey(to='app.Parent')),
-                ('section', models.ForeignKey(to='app.Section')),
+                ('parent', models.ForeignKey(to='app.Parent', on_delete=models.CASCADE)),
+                ('section', models.ForeignKey(to='app.Section', on_delete=models.CASCADE)),
             ],
         ),
     ]
