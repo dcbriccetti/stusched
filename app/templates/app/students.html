@@ -1,5 +1,6 @@
 {% extends "app/base.html" %}
 {% load sections %}
+{% load nav %}
 
 {% block title %}{{ block.super }} - Status{% endblock %}
 
@@ -17,7 +18,7 @@
     {% for student in parent.students %}
         <div class="well">
             <h3 style="margin-top: 0">
-                <a href='{% url 'student' student.id %}'><span title="Edit student profile" class="glyphicon glyphicon-edit"></span></a>
+                <a href='{% xurl 'student' %}/{{ student.id }}'><span title="Edit student profile" class="glyphicon glyphicon-edit"></span></a>
                 {{ student.name }}
             </h3>
             <dl class="dl-horizontal">
@@ -44,6 +45,6 @@
         {% endwith %}
         </div>
     {% endfor %}
-    <a id='add' class='btn btn-primary btn-sm' role="button" href='{% url 'student' 0%}?parent_id={{ parent.id }}'>Add a student</a>
+    <a id='add' class='btn btn-primary btn-sm' role="button" href='{% xurl 'student' %}0?parent_id={{ parent.id }}'>Add a student</a>
 {% endfor %}
 {% endblock %}

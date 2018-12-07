@@ -1,4 +1,5 @@
 {% extends "app/base.html" %}
+{% load nav %}
 {% load vars %}
 {% load bootstrap3 %}
 
@@ -12,7 +13,7 @@
     {% if user.is_authenticated %}
         <p>If you make any changes, push the <strong>Save Changes</strong> button below.</p>
     {% else %}
-        <p><a href="{% url 'log-in' %}?next=courses">Log in</a></p>
+        <p><a href="{% xurl 'login' %}?next=courses">Log in</a></p>
     {% endif %}
     <div class="well">
     <form method="post">

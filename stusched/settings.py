@@ -113,7 +113,7 @@ STATICFILES_DIRS = (
 # https://warehouse.python.org/project/whitenoise/
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
-LOGIN_URL = '/apps/sis/login'
+LOGIN_URL = os.environ['APP_PATH'] + '/login'
 
 logging_time = '%(asctime)s\t' if DEBUG else ''
 LOGGING = {

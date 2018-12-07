@@ -1,3 +1,5 @@
+{% load nav %}
+
 <table class="table">
     <thead>
     <tr>
@@ -23,12 +25,12 @@
         {% if show_internal_links %}
             <td>
                 {% if user.is_staff or row.viewable %}
-                <a href='/app/section/{{ row.section.id }}'><span class="glyphicon glyphicon-eye-open" title="View section details"></span></a>
+                <a href='{% xurl 'section' %}/{{ row.section.id }}'><span class="glyphicon glyphicon-eye-open" title="View section details"></span></a>
                 {% endif %}
 
                 {% if row.section.registration_open and user.is_authenticated and not user.is_staff %}
                     <a title='Change Registration'
-                       class='chg-reg btn btn-primary btn-xs' role="button" href='/app/section/{{ row.section.id }}/register'>Reg</a>
+                       class='chg-reg btn btn-primary btn-xs' role="button" href='{% xurl 'section' %}/{{ row.section.id }}/register'>Reg</a>
                 {% endif %}
             </td>
         {% endif %}

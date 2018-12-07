@@ -21,19 +21,19 @@
     <h1>Dave B’s Student Information System</h1>
 
     <ul class="nav nav-tabs">
-        <li role="presentation" class={% active_nav request 'index'     %}><a href="{% url 'index'    %}">Home</a>    </li>
+        <li role="presentation" class={% active_nav request 'index'     %}><a href="{% xurl ''         %}">Home</a>    </li>
         {% if user.is_staff %}
-        <li role="presentation" class={% active_nav request 'admin'     %}><a href="{% url 'admin'    %}">Admin</a>   </li>
+        <li role="presentation" class={% active_nav request 'admin'     %}><a href="{% xurl 'admin'    %}">Admin</a>   </li>
         {% endif %}
-        <li role="presentation" class={% active_nav request 'news'      %}><a href="{% url 'news'     %}">News</a>    </li>
+        <li role="presentation" class={% active_nav request 'news'      %}><a href="{% xurl 'news'     %}">News</a>    </li>
         {% if not user.is_staff %}
-        <li role="presentation" class={% active_nav request 'parent'    %}><a href="{% url 'parent'   %}">Parent</a>  </li>
+        <li role="presentation" class={% active_nav request 'parent'    %}><a href="{% xurl 'parent'   %}">Parent</a>  </li>
         {% endif %}
-        <li role="presentation" class={% active_nav request 'students'  %}><a href="{% url 'students' %}">Students</a></li>
-        <li role="presentation" class={% active_nav request 'courses'   %}><a href="{% url 'courses'  %}">Courses</a> </li>
-        <li role="presentation" class={% active_nav request 'sections'  %}><a href="{% url 'sections' %}">Sections</a></li>
+        <li role="presentation" class={% active_nav request 'students'  %}><a href="{% xurl 'students' %}">Students</a></li>
+        <li role="presentation" class={% active_nav request 'courses'   %}><a href="{% xurl 'courses'  %}">Courses</a> </li>
+        <li role="presentation" class={% active_nav request 'sections'  %}><a href="{% xurl 'sections' %}">Sections</a></li>
         {% if user.is_authenticated %}
-        <li role="presentation" class={% active_nav request ''          %}><a href="{% url 'log-out'  %}">Log Out </a></li>
+        <li role="presentation" class={% active_nav request ''          %}><a href="{% xurl 'logout'   %}">Log Out </a></li>
         {% endif %}
     </ul>
 

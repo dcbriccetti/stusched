@@ -26,7 +26,7 @@ class SectionFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Section
 
-    start_time = '2016-08-30T13:00:00'
+    start_time = '2024-08-30T13:00:00'
     scheduled_status = 1
     hours_per_day = 3
     num_days = 1

@@ -1,5 +1,6 @@
 {% extends "app/base.html" %}
 {% load bootstrap3 %}
+{% load nav %}
 
 {% block title %}{{ block.super }} - Section Registrations{% endblock %}
 
@@ -10,7 +11,7 @@
     <div class="row" style="margin-top: 2em">
         {% for swa in students_with_assignment %}
         <div class="col-md-2">
-        <form action="/app/section/{{ section.id }}/register/{{ swa.student.id }}" method="post">
+        <form action="{% xurl 'section' %}/{{ section.id }}/register/{{ swa.student.id }}" method="post">
             {% csrf_token %}
             <div class="well well-sm">
                 <h4>{{ swa.student }}</h4>

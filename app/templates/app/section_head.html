@@ -1,7 +1,8 @@
+{% load nav %}
 <h2>{{ section.course.name }} {% if section.scheduled_status_string %}({{ section.scheduled_status_string }}){% endif %}</h2>
 <h4>{{ section.when }}{% if section.price %}, ${{ section.price }} {% endif %}
 <a title='Download a file to import this event into a calendar application'
-   class='btn btn-primary btn-xs' role="button" href='/app/section/{{ section.id }}/calendar'>Add to Calendar</a>
+   class='btn btn-primary btn-xs' role="button" href='{% xurl 'section' %}/{{ section.id }}/calendar'>Add to Calendar</a>
 </h4>
 {% if section.notes %}
     <h4>Notes</h4>

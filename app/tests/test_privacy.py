@@ -1,3 +1,4 @@
+from os import environ
 from time import sleep
 
 from app.factories import StudentFactory, ParentFactory, SectionFactory, UserFactory
@@ -34,26 +35,29 @@ class BrowserTest(LiveServerTestCase):
         def nav_texts():
             return texts('.nav li a')
         def admin_page_not_found():
-            b.get("%s/app/admin" % self.live_server_url)
+            b.get("%s/admin" % self.app_url())
             self.assertIn('Not Found', texts('h1'))
 
         b = self.b
         admin_page_not_found()
 
-        b.get("%s/app" % self.live_server_url)
+        b.get(self.app_url())
         self.assertNotIn('Admin', nav_texts())
 
         User.objects.create_superuser(username='admin', password='password', email='')
         self.log_in('admin')
-        b.get("%s/app" % self.live_server_url)
+        b.get(self.app_url())
         self.assertIn('Admin', nav_texts())
 
         user = UserFactory.create()
         self.log_in(user.username)
-        b.get("%s/app" % self.live_server_url)
+        b.get(self.app_url())
         self.assertNotIn('Admin', nav_texts())
 
         admin_page_not_found()
+
+    def app_url(self):
+        return self.live_server_url + environ['APP_PATH']
 
     def test_accepted_student_sees_others(self):
         'The parent of a student accepted into a section can see all accepted students in that section.'
@@ -63,9 +67,12 @@ class BrowserTest(LiveServerTestCase):
         u2 = Ups(section)
 
         self.log_in(u1.user.username)
-        self.b.get("%s/app/sections" % self.live_server_url)
+        self.b.get(self.sections_url())
         expected_names = sorted([u1.stu.name, u2.stu.name])
         self.assertEqual(', '.join(expected_names), self.student_names())
+
+    def sections_url(self):
+        return self.app_url() + "/sections"
 
     def test_staff_sees_all(self):
         'A staff user can see all students in a section.'
@@ -76,7 +83,7 @@ class BrowserTest(LiveServerTestCase):
         names = self.names_of_many_upses(section)
 
         self.log_in(su.username)
-        self.b.get("%s/app/sections" % self.live_server_url)
+        self.b.get(self.sections_url())
         self.assertEqual(', '.join(names), self.student_names())
 
     def test_student_not_in_section_sees_no_names(self):
@@ -85,7 +92,7 @@ class BrowserTest(LiveServerTestCase):
         not_in_section_ups = Ups()
 
         self.log_in(not_in_section_ups.user.username)
-        self.b.get("%s/app/sections" % self.live_server_url)
+        self.b.get(self.sections_url())
         self.assertEqual('', self.student_names())
 
     def test_applied_student_sees_no_names(self):
@@ -94,17 +101,18 @@ class BrowserTest(LiveServerTestCase):
         applied_ups = Ups(section, status=SS_STATUS_APPLIED)
 
         self.log_in(applied_ups.user.username)
-        self.b.get("%s/app/sections" % self.live_server_url)
+        self.b.get(self.sections_url())
         self.assertEqual('', self.student_names())
 
     def student_names(self):
+        sleep(5)
         return self.b.find_element_by_css_selector('.student-names').text
 
     def names_of_many_upses(self, section):
         return sorted([Ups(section).stu.name for _ in range(6)])
 
     def log_in(self, username):
-        self.b.get("%s/app/login" % self.live_server_url)
+        self.b.get(self.app_url() + "/login")
         sel = self.b.find_element_by_css_selector
         sel('#log-in-form #id_username').send_keys(username)
         sel('#log-in-form #id_password').send_keys('password')

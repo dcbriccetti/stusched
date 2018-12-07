@@ -1,12 +1,13 @@
 {% extends "app/base.html" %}
 {% load bootstrap3 %}
+{% load nav %}
 
 {% block title %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
     <h2>Edit Parent</h2>
-    <form action="{% url 'parent' %}" method="post">
+    <form action="{% xurl 'parent' %}" method="post">
         {% csrf_token %}
         {% bootstrap_form form %}
         {% buttons %}
