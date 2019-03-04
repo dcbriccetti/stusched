@@ -252,8 +252,8 @@ class ParentView(LoginRequiredMixin, View):
 
 
 class Student(LoginRequiredMixin, View):
-    def get(self, request, student_id):
-        if student_id == '0':
+    def get(self, request, student_id: int):
+        if student_id == 0:
             parent = get_object_or_404(Parent, pk=request.GET['parent_id'])
             form = StudentForm()
             student_id = 0
@@ -271,8 +271,8 @@ class Student(LoginRequiredMixin, View):
         else:
             raise Http404('That is not a student you can edit')
 
-    def post(self, request, student_id):
-        if student_id == '0':
+    def post(self, request, student_id: int):
+        if student_id == 0:
             parent = Parent.objects.filter(id=request.GET['parent_id']).first()
             student = None
         else:
